@@ -7,37 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-//import static com.company.Main.print_fixed;
-import static com.company.Main.so;
+import static com.company.InputParser.so;
 
-enum Directions {
-    NORTH, SOUTH, EAST, WEST
-}
-
-
-public class Main {
+public class InputParser {
     public static PrintStream so = System.out;
 
-    //this is just a test class
-    public static void print_fixed(boolean stuff) {
-        if(stuff == true) {
-            so.println("Found!");
-        }
-        else {
-           so.println("Not Found.");
-        }
-    }
-
     public static void runTests() {
-        //keywords for directions
-        //String[] directions = { "NORTH", "SOUTH", "EAST", "WEST" };
-
-        //keywords for actions
-        //String[] actions = {"ATTACK", "SEARCH", "UNLOCK", "JUMP"};
 
         KeyWords key = new KeyWords();
 
-        //String[] tempArray;
         Scanner scan = new Scanner(System.in);
 
         String input;
@@ -55,56 +33,6 @@ public class Main {
 
         //a class that combines all of these
         key.getCommand(list);
-
-        //checkDirections(words);
-
-        //this is perfect for parser
-        //for(String keywords : directions) {
-        //if(input.contains(keywords)) {
-        //so.println("Found word! " + keywords);
-        //}
-        //}
-
-        //must use .contains or else it will not read it
-        //for(int i = 0; i < directions.length; ++i) {
-            //if(input.contains(directions[i])) {
-                //so.println("Found direction! " + directions[i]);
-            //}
-        //}
-
-        //perfect for identifying words
-        //for(int i = 0; i < actions.length; ++i) {
-            //if(input.contains(actions[i])) {
-                //so.println("Found action! " + actions[i]);
-           //}
-        //}
-
-
-
-        //this is just to print out the words the user has typed in
-        //for(String token : words) {
-            //so.println(token);
-        //}
-
-
-
-        //I can maybe use a array list to print to combine
-        //for(int i = 0; i < directions.length; ++i) {
-        //if(input.contains(directions[i])) {
-        //so.println("You went west");
-        //}
-        //}
-
-        //this is reading the string but only
-        //if(input.equals(Directions.NORTH.name())) {
-        //so.println("You went north");
-        //}
-    }
-
-    public static void checkDirections(String words[]) {
-        for(int i = 0; i < words.length; ++i) {
-            so.println(words[i]);
-        }
     }
 
     public static void main(String[] args) {
@@ -191,11 +119,6 @@ class KeyWords
             so.println("Please input a command.");
         }
 
-        //definitely combine all of these functions into one
-/*        checkDirections(words);
-        checkActions(words);
-        checkItems(words);*/
-
         checkLegitCommand(words);
     }
 
@@ -224,7 +147,6 @@ class KeyWords
             if(words.contains(directions[i])) {
                 so.println("Found direction! " + directions[i]);
                 setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
 
                 setDirection(directions[i]);
 
@@ -247,13 +169,7 @@ class KeyWords
         putWordsTogether(keywords);
     }
 
-    //this can take a boolean and a String
     public void putWordsTogether(List<String> words) {
-/*        for(int i = 0; i < words.size(); ++i) {
-            so.println(words.get(i));
-        }*/
-
-
         //this checks if they had used an action combined with a direction
         //if they did, it would then check the specific words and determine the action
         if(getBAction() == true && getBDirection() == true) {
@@ -275,53 +191,5 @@ class KeyWords
                 so.println("You took the sword.");
             }
         }
-
-/*        if(words.equals("GO NORTH")) {
-            so.print("You went north");
-        }*/
-
     }
-
-    //check directions
-/*    private void checkDirections(List<String> words) {
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                so.println("Found direction! " + directions[i]);
-                returnDirection(true); //you have to access the actual variable
-            }
-            else {
-                returnDirection(false);
-            }
-        }
-    }
-
-    //check for actions
-    private void checkActions(List<String> words) {
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                so.println("Found action! " + actions[i]);
-                returnAction(true);
-            }
-            else {
-                returnAction(false);
-            }
-        }
-    }
-
-    //check for items
-    private void checkItems(List<String> words) {
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                so.println("Found item! " + items[i]);
-                returnItem(true);
-            }
-            else {
-                returnItem(false);
-            }
-        }
-    }*/
-
-    //create a combiner of words function so it can be passed to a
-    //function to determine the final action
 }
