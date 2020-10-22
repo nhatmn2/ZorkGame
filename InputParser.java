@@ -63,12 +63,7 @@ class KeyWords
             "LEAFLET", "MAILBOX", "DOOR", "WINDOW", "TROPHY", "SWORD"
     };
 
-    //String keywords[];
-
-    //I can do a boolean whether its a direction or an action
-    //The directions will only need at least one true boolean and check what direction it is to go that specific direction
-    //The actions will have to be specific and might need another
-
+    //variables for user specific input
     String direction;
     String action;
     String item;
@@ -78,6 +73,7 @@ class KeyWords
     boolean bAction;
     boolean bItem;
 
+    //constructors
     public KeyWords() { this(" ", " ", " ", false, false, false); }
     public KeyWords(String direction, String action, String item,
                     boolean bDirection, boolean bAction, boolean bItem)
@@ -109,8 +105,6 @@ class KeyWords
     public void setAction(String action) { this.action = action; }
     public void setItem(String item) { this.item = item; }
 
-    //I could probably combine all these function commands to 1 function
-
     //checks if the list is null, then passes the list to another function
     public void getCommand(List<String> words) {
         //check if the incoming list of strings is empty
@@ -118,13 +112,14 @@ class KeyWords
         {
             so.println("Please input a command.");
         }
-
+          
+        //list is then passed to a function to determine the action of the user
         checkLegitCommand(words);
     }
 
     //function checks for the specifics in user input
     private void checkLegitCommand(List<String> words) {
-        //String keywords[] = { };
+        //normally, in game you don't need to specify too much of your action other than a quick 2 to 3 word input
 
         List<String> keywords = new ArrayList<String>();
 
