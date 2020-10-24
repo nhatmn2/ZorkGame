@@ -197,12 +197,12 @@ class ItemList {
 class LivingRoom extends Room {
     //create livingRoom with tools
     private final String description = "You are entering the living room. In here you can find all the tool you need for your journey";
-    private ItemList livingRoomItemList;
     //when the livingRoom is created the livingRoomItemList is also created
     LivingRoom() {
         super();
         System.out.println(description);
         //this is for creating item list inside living room!
+        ItemList livingRoomItemList = new ItemList(); 
         livingRoomItemList.addItems("Trophy case");
         livingRoomItemList.addItems("Lamp");
         livingRoomItemList.addItems("Rug");
