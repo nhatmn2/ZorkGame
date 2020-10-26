@@ -321,5 +321,10 @@ public class Zork{
         Maze maze = game.createMaze();
         maze.showRoomList();
         System.out.println("Hello");
+        System.out.println();
+        System.out.println("Step1: I removed the project on my laptop since I dont have anything new");
+        System.out.println("Step2: Open intelliJ then click to get from version control");
+        System.out.println("Step3 Enter your github name/ZorkGame URL and then click ok ");
+
     }
 }
