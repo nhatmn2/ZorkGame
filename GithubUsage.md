@@ -1,4 +1,4 @@
-#This is a github usage guild to make everyone synchronize and work with each other.
+# This is a github usage guild to make everyone synchronize and work with each other.
 Basically you need to have your intelliJ project all have the same name as your Github repository which is "ZorkGame".  
 To do so you need to clone the project from your Github web UI:
 * step 1: you need to synchronize your intelliJ with your github account 
