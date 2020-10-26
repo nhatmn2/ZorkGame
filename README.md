@@ -4,5 +4,6 @@ We're going to use java with some design pattern concepts to create the game.
 Things to do:
 * upload the map
 * come up with ways to parse the game 
-* start programming and debugging the code. 
+* start programming and debugging the code.
+* we have only 6 more days to complete this project.  
 ## deadline is on Friday 10/30/2020
