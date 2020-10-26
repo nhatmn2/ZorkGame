@@ -320,5 +320,6 @@ public class Zork{
         MazeGame game = new ZorkMazeGame();
         Maze maze = game.createMaze();
         maze.showRoomList();
+        System.out.println("Hello");
     }
 }
