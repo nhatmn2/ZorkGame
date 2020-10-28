@@ -241,19 +241,10 @@ class ItemList {
 }
 
 //======================================================================================================
-// Starting point Interface
-//===========================================================================
-interface RoomTracker {
-    public void startingPoint();
-    public void itemsTakenOrNot();
-}
-
-
-//======================================================================================================
 //create livingRoom
 //======================================================================================================
 
-class LivingRoom extends Room {
+class LivingRoom extends Room implements WordParser {
     //create livingRoom with tools
     private MazeGame underground;
     private final String description = "You are entering the living room. In here you can find all the tool you need for your journey";
@@ -336,6 +327,7 @@ class LivingRoom extends Room {
         //here will be actions leading to either the cellar or the kitchen
         if(words.contains("GO") && words.contains("KITCHEN")) {
             //player will end up in the kitchen
+            Kitchen kitchen = new Kitchen();
         }
         else {
 
@@ -480,10 +472,10 @@ class GrassyFields extends Room implements WordParser{
     public void putWordsTogether(List<String> words) {
         //if the command is "open door" then the player will end up in the living room
         //still trying to figure out how that is going to work
-        //player class can be updated in this function to keep track of process
-        MazeGame mazeGame = new MazeGame();
+        //player class can be updated in this function to keep track of proces
         if(words.contains("OPEN") && words.contains("DOOR")) {
-            LivingRoom livingRoom = new LivingRoom(mazeGame);
+            ZorkUnderground zorkUnderground = new ZorkUnderground();
+            LivingRoom livingRoom = new LivingRoom(zorkUnderground);
             //create another starting point in the living room class
         }
         else {
@@ -847,9 +839,9 @@ abstract interface WordParser {
 class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the rooms together
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
-        MazeGame mazeGame = new MazeGame();
+        ZorkUnderground zorkUnderground = new ZorkUnderground();
         if(kindOfRoom.equals("LivingRoom"))
-            return new LivingRoom(mazeGame);
+            return new LivingRoom(zorkUnderground);
         else if(kindOfRoom.equals("Kitchen"))
             return new Kitchen();
             //we need to put more else if every time we create the new room...........
