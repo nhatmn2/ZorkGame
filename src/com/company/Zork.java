@@ -253,7 +253,7 @@ interface RoomTracker {
 //create livingRoom
 //======================================================================================================
 
-class LivingRoom extends Room {
+class LivingRoom extends Room implements WordParser {
     //create livingRoom with tools
     private MazeGame underground;
     private final String description = "You are entering the living room. In here you can find all the tool you need for your journey";
