@@ -34,6 +34,53 @@ abstract class MapSite{
 //============================================================================================================
 
 class Room extends MapSite {
+    //this is for the word parsing for each room
+    //keywords for directions
+    String[] directions = {
+            "NORTH", "SOUTH", "EAST", "WEST", "FORWARD", "BACKWARDS",
+            "LEFT", "RIGHT", "UPSTAIRS", "DOWNSTAIRS", "CELLAR", "WINDOW", //the window is basically go forward or go north
+            "DOOR", "KITCHEN"
+    };
+
+    //keywords for actions
+    String[] actions = {
+            "ATTACK", "SEARCH", "UNLOCK", "JUMP", "TAKE", "LOOK", "GO", "OPEN",
+            "INVENTORY", "OPEN", "SAVE"
+    };
+
+    //Might need an array of items
+    String[] items = {
+            "LEAFLET", "MAILBOX", "WINDOW", "TROPHY", "SWORD"
+    };
+
+    private String direction;
+    private String action;
+    private String item;
+
+
+    private boolean bDirection; //the 'b' just means boolean
+    private boolean bAction;
+    boolean bItem;
+
+    //accessors
+    public String getDirection() { return direction; }
+    public String getAction() { return action; }
+    public String getItem() { return item; }
+
+    public boolean getBDirection() { return bDirection; }
+    public boolean getBAction() { return bAction; }
+    public boolean getBItem() { return bItem; }
+
+    //mutators
+    public void setBDirection(boolean bDirection) { this.bDirection = bDirection; }
+    public void setBAction(boolean bAction) { this.bAction = bAction; }
+    public void setBItem(boolean bItem) { this.bItem = bItem; }
+
+    public void setDirection(String direction) { this.direction = direction; }
+    public void setAction(String action) { this.action = action; }
+    public void setItem(String item) { this.item = item; }
+
+    //this is for the room itself
     private int roomNumber;
     //this field is for the const starting room
     private static int roomCount = 1;
@@ -222,6 +269,69 @@ class LivingRoom extends Room {
     public String toString() {
         return "living room";
     }
+    
+    public void getCommand(List<String> words) {
+        //check if the incoming list of strings is empty
+        if(words.isEmpty())
+        {
+            System.out.println("Please input a command.");
+        }
+        checkLegitCommand(words);
+    }
+
+    public void checkLegitCommand(List<String> words) {
+        List<String> keywords = new ArrayList<String>();
+
+        //check for actions(verbs)
+        for(int i = 0; i < actions.length; ++i) {
+            if(words.contains(actions[i])) {
+                System.out.println("Found action! " + actions[i]);
+                setBAction(true);
+
+                setAction(actions[i]);
+
+                keywords.add(getAction());
+            }
+        }
+
+        //check for directions
+        for(int i = 0; i < directions.length; ++i) {
+            //this shit works
+            if(words.contains(directions[i])) {
+                System.out.println("Found direction! " + directions[i]);
+                setBDirection(true); //you have to access the actual variable
+                //this.bDirection = true;
+
+                setDirection(directions[i]);
+
+                keywords.add(getDirection());
+            }
+        }
+
+        //check for items
+        for(int i = 0; i < items.length; ++i) {
+            if(words.contains(items[i])) {
+                System.out.println("Found item! " + items[i]);
+                setBItem(true);
+                setItem(items[i]);
+
+                keywords.add(getItem());
+            }
+        }
+
+        //pass the keywords to the final class to determine the final action
+        putWordsTogether(keywords);
+    }
+
+    public void putWordsTogether(List<String> words) {
+        //here will be actions leading to either the cellar or the kitchen
+        if(words.contains("GO") && words.contains("KITCHEN")) {
+            //player will end up in the kitchen
+        }
+        else {
+
+        }
+    }
 }
 
 //=====================================================================================================
@@ -286,6 +396,91 @@ class Attic extends Room {
     }
 
     public String toString() { return "attic"; }
+}
+
+//=====================================================================================================
+//Creating Starting Point/Grassy Fields
+//==========================================================================
+class GrassyFields extends Room implements WordParser{
+    //we're gonna have to implement a getCommand and a putWordsTogether function in each room
+    
+    //checks if the list is null, then passes the list to another function
+    List<String> list = new ArrayList<String>();
+
+    private final String description = "You are in a grassy field.";
+    GrassyFields() {
+        super();
+        System.out.println(description);
+    }
+
+    public String toString() { return "grassy field"; }
+
+    public void getCommand(List<String> words) {
+        //check if the incoming list of strings is empty
+        if(words.isEmpty())
+        {
+            System.out.println("Please input a command.");
+        }
+        checkLegitCommand(words);
+    }
+
+    public void checkLegitCommand(List<String> words) {
+        List<String> keywords = new ArrayList<String>();
+
+        //check for actions(verbs)
+        for(int i = 0; i < actions.length; ++i) {
+            if(words.contains(actions[i])) {
+                System.out.println("Found action! " + actions[i]);
+                setBAction(true);
+
+                setAction(actions[i]);
+
+                keywords.add(getAction());
+            }
+        }
+
+        //check for directions
+        for(int i = 0; i < directions.length; ++i) {
+            //this shit works
+            if(words.contains(directions[i])) {
+                System.out.println("Found direction! " + directions[i]);
+                setBDirection(true); //you have to access the actual variable
+                //this.bDirection = true;
+
+                setDirection(directions[i]);
+
+                keywords.add(getDirection());
+            }
+        }
+
+        //check for items
+        for(int i = 0; i < items.length; ++i) {
+            if(words.contains(items[i])) {
+                System.out.println("Found item! " + items[i]);
+                setBItem(true);
+                setItem(items[i]);
+
+                keywords.add(getItem());
+            }
+        }
+
+        //pass the keywords to the final class to determine the final action
+        putWordsTogether(keywords);
+    }
+
+    public void putWordsTogether(List<String> words) {
+        //if the command is "open door" then the player will end up in the living room
+        //still trying to figure out how that is going to work
+        //player class can be updated in this function to keep track of process
+        if(words.contains("OPEN") && words.contains("DOOR")) {
+            LivingRoom livingRoom = new LivingRoom();
+            //create another starting point in the living room class
+        }
+        else {
+
+        }
+    }
+
 }
 
 //=======================================================================================================
@@ -628,6 +823,14 @@ class ZorkUnderground extends MazeGame{
     }
 }
 
+//=============================================================================
+// Interface WordParser
+//=============================================================================
+abstract interface WordParser {
+    public void checkLegitCommand(List<String> words);
+    abstract void putWordsTogether(List<String> words);
+}
+
 //=========================================================================================================
 //create a livingRoomAndKitchenMaze
 //=========================================================================================================
@@ -635,12 +838,14 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
         if(kindOfRoom.equals("LivingRoom"))
-            return new LivingRoom(new ZorkUnderground());
+            return new LivingRoom();
         else if(kindOfRoom.equals("Kitchen"))
             return new Kitchen();
             //we need to put more else if every time we create the new room...........
         else if(kindOfRoom.equals("Attic"))
             return new Attic(); //new room class
+        else if(kindOfRoom.equals("GrassyFields"))
+            return new GrassyFields();
         else
             return new Room();
 
@@ -652,6 +857,7 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         Room newLivingRoom = makeRoom("LivingRoom");
         Room newKitchen = makeRoom("Kitchen");
         Room newAttic = makeRoom("Attic");
+        Room newGrassyFields = makeRoom("GrassyFields");
 
         //gotta add a connection to the kitchen and the attic
         Door newlivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen);
@@ -659,11 +865,17 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         //"door" to the attic
         Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic);
 
+        //connect grassyfields to the living room
+        Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom);
+
         ZorkMaze.addRoom(newLivingRoom);
         ZorkMaze.addRoom(newKitchen);
 
         //new room Attic
         ZorkMaze.addRoom(newAttic);
+
+        //new "room" GrassyFields
+        ZorkMaze.addRoom(newGrassyFields);
 
         //walls for the living room
         newLivingRoom.setSide(Direction.North, makeWall());
@@ -683,164 +895,15 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         newAttic.setSide(Direction.West, makeWall());
         newAttic.setSide(Direction.East, newKitchenDoorAndAttic);
 
+        //"walls" for the grassy fields
+        newGrassyFields.setSide(Direction.North, makeWall());
+        newGrassyFields.setSide(Direction.South, makeWall());
+        newGrassyFields.setSide(Direction.West, makeWall());
+        newGrassyFields.setSide(Direction.East, newGrassyFieldsAndLivingRoom);
+
         //we need to add more doors and rooms and the relation between everytime we add rooms to map......
 
         return ZorkMaze;
-    }
-}
-
-//=========================================================================================================
-// WordParser
-//==============================================================================
-class KeyWords
-{
-    //keywords for directions
-    private String[] directions = {
-            "NORTH", "SOUTH", "EAST", "WEST", "FORWARD", "BACKWARDS",
-            "LEFT", "RIGHT", "UPSTAIRS", "DOWNSTAIRS", "CELLAR"
-    };
-
-    //keywords for actions
-    private String[] actions = {
-            "ATTACK", "SEARCH", "UNLOCK", "JUMP", "TAKE", "LOOK", "GO", "OPEN",
-            "INVENTORY"
-    };
-
-    //Might need an array of items
-    private String[] items = {
-            "LEAFLET", "MAILBOX", "DOOR", "WINDOW", "TROPHY", "SWORD"
-    };
-
-    //String keywords[];
-
-    //I can do a boolean whether its a direction or an action
-    //The directions will only need at least one true boolean and check what direction it is to go that specific direction
-    //The actions will have to be specific and might need another
-
-    String direction;
-    String action;
-    String item;
-
-
-    boolean bDirection; //the 'b' just means boolean
-    boolean bAction;
-    boolean bItem;
-
-    public KeyWords() { this(" ", " ", " ", false, false, false); }
-    public KeyWords(String direction, String action, String item,
-                    boolean bDirection, boolean bAction, boolean bItem)
-    {
-        this.direction = direction;
-        this.action = action;
-        this.item = item;
-
-        this.bDirection = bDirection;
-        this.bAction = bAction;
-        this.bItem = bItem;
-    }
-
-    //accessors
-    public String getDirection() { return direction; }
-    public String getAction() { return action; }
-    public String getItem() { return item; }
-
-    public boolean getBDirection() { return bDirection; }
-    public boolean getBAction() { return bAction; }
-    public boolean getBItem() { return bItem; }
-
-    //mutators
-    public void setBDirection(boolean bDirection) { this.bDirection = bDirection; }
-    public void setBAction(boolean bAction) { this.bAction = bAction; }
-    public void setBItem(boolean bItem) { this.bItem = bItem; }
-
-    public void setDirection(String direction) { this.direction = direction; }
-    public void setAction(String action) { this.action = action; }
-    public void setItem(String item) { this.item = item; }
-
-    //I could probably combine all these function commands to 1 function
-
-    //checks if the list is null, then passes the list to another function
-    public void getCommand(List<String> words) {
-        //check if the incoming list of strings is empty
-        if(words.isEmpty())
-        {
-            System.out.println("Please input a command.");
-        }
-        checkLegitCommand(words);
-    }
-
-    //function checks for the specifics in user input
-    private void checkLegitCommand(List<String> words) {
-        //String keywords[] = { };
-
-        List<String> keywords = new ArrayList<String>();
-
-        //check for actions(verbs)
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                System.out.println("Found action! " + actions[i]);
-                setBAction(true);
-
-                setAction(actions[i]);
-
-                keywords.add(getAction());
-            }
-        }
-
-        //check for directions
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                System.out.println("Found direction! " + directions[i]);
-                setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
-
-                setDirection(directions[i]);
-
-                keywords.add(getDirection());
-            }
-        }
-
-        //check for items
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                System.out.println("Found item! " + items[i]);
-                setBItem(true);
-                setItem(items[i]);
-
-                keywords.add(getItem());
-            }
-        }
-
-        //pass the keywords to the final class to determine the final action
-        putWordsTogether(keywords);
-    }
-
-    //this can take a boolean and a String
-    public void putWordsTogether(List<String> words) {
-        //this checks if they had used an action combined with a direction
-        //if they did, it would then check the specific words and determine the action
-        if(getBAction() == true && getBDirection() == true) {
-            if(words.contains("GO") && words.contains("NORTH")) {
-                System.out.println("You went north.");
-            }
-
-            if(words.contains("GO") && words.contains("UPSTAIRS")) {
-                System.out.println("You went upstairs.");
-            }
-        }
-
-        if(getBAction() == true && getBItem() == true) {
-            if(words.contains("TAKE") && words.contains("LEAFLET")) {
-                System.out.println("You took the leaflet");
-            }
-
-            if(words.contains("TAKE") && words.contains("SWORD")) {
-                System.out.println("You took the sword.");
-            }
-        }
-
-        //so.println("This is the new push");
     }
 }
 
