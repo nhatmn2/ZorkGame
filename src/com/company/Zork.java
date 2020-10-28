@@ -481,9 +481,9 @@ class GrassyFields extends Room implements WordParser{
         //if the command is "open door" then the player will end up in the living room
         //still trying to figure out how that is going to work
         //player class can be updated in this function to keep track of process
-        MazeGame mazeGame = new MazeGame();
         if(words.contains("OPEN") && words.contains("DOOR")) {
-            LivingRoom livingRoom = new LivingRoom(mazeGame);
+            ZorkUnderground zorkUnderground = new ZorkUnderground(); 
+            LivingRoom livingRoom = new LivingRoom();
             //create another starting point in the living room class
         }
         else {
@@ -847,9 +847,9 @@ abstract interface WordParser {
 class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the rooms together
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
-        MazeGame mazeGame = new MazeGame();
+        ZorkUnderground zorkUnderground = new ZorkUnderground(); 
         if(kindOfRoom.equals("LivingRoom"))
-            return new LivingRoom(mazeGame);
+            return new LivingRoom(zorkUnderground);
         else if(kindOfRoom.equals("Kitchen"))
             return new Kitchen();
             //we need to put more else if every time we create the new room...........
