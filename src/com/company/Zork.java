@@ -241,6 +241,15 @@ class ItemList {
 }
 
 //======================================================================================================
+// Starting point Interface
+//===========================================================================
+interface RoomTracker {
+    public void startingPoint();
+    public void itemsTakenOrNot();
+}
+
+
+//======================================================================================================
 //create livingRoom
 //======================================================================================================
 
@@ -404,7 +413,6 @@ class Attic extends Room {
 class GrassyFields extends Room implements WordParser{
     //we're gonna have to implement a getCommand and a putWordsTogether function in each room
 
-    //checks if the list is null, then passes the list to another function
     List<String> list = new ArrayList<String>();
 
     private final String description = "You are in a grassy field.";
@@ -415,6 +423,7 @@ class GrassyFields extends Room implements WordParser{
 
     public String toString() { return "grassy field"; }
 
+    //checks if the list is null, then passes the list to another function
     public void getCommand(List<String> words) {
         //check if the incoming list of strings is empty
         if(words.isEmpty())
