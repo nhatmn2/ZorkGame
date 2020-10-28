@@ -1,8 +1,6 @@
 package src.com.company;
 //package com.company;
 
-
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -201,18 +199,25 @@ class ItemList {
 
 class LivingRoom extends Room {
     //create livingRoom with tools
+    private MazeGame underground;
     private final String description = "You are entering the living room. In here you can find all the tool you need for your journey";
     //when the livingRoom is created the livingRoomItemList is also created
-    LivingRoom() {
+    LivingRoom(MazeGame newMaze) {
         super();
-        System.out.println(description);
+        //I created another underground Maze after you enter the cellar.
+        this.underground = newMaze;
+        //System.out.println(description);
         //this is for creating item list inside living room!
+        getDescription();
         ItemList livingRoomItemList = new ItemList();
         livingRoomItemList.addItems("Trophy case");
         livingRoomItemList.addItems("Lamp");
         livingRoomItemList.addItems("Rug");
         livingRoomItemList.addItems("Old Sword");
         livingRoomItemList.showItemList();
+    }
+    public String getDescription(){
+        return description;
     }
     public String toString() {
         return "living room";
@@ -233,7 +238,7 @@ class LivingRoom extends Room {
 //}
 
 //=====================================================================================================
-//creating Kitchen
+//create Kitchen
 //=====================================================================================================
 class Kitchen extends Room {
     //create kitchen with tools
@@ -241,17 +246,26 @@ class Kitchen extends Room {
     private final String description = "You are entering the kitchen.";
     Kitchen() {
         super();
-        System.out.println(description);
+        //System.out.println(description);
+        getDescription();
         ItemList kitchenItemList = new ItemList();
         kitchenItemList.addItems("Sack");
         kitchenItemList.addItems("Garlic");
         kitchenItemList.addItems("Bottle of water");
         kitchenItemList.showItemList();
     }
+
+    public String getDescription() {
+        return description;
+    }
+
     public String toString() {
         return "kitchen";
     }
 }
+//=======================================================================================================
+//create Attic
+//=======================================================================================================
 
 class Attic extends Room {
     //don't forget to create items for the attic
@@ -259,17 +273,207 @@ class Attic extends Room {
     private final String description = "You are entering the attic.";
     Attic() {
         super();
-        System.out.println(description);
+        //System.out.println(description);
+        getDescription();
         ItemList atticItemList = new ItemList();
         atticItemList.addItems("Rope");
         atticItemList.addItems("Brick");
         atticItemList.addItems("Axe");
         atticItemList.showItemList(); //just to test whether the items are showing up
     }
+    public String getDescription() {
+        return description;
+    }
 
     public String toString() { return "attic"; }
 }
 
+//=======================================================================================================
+//create Cellar
+//=======================================================================================================
+class Cellar extends Room {
+    private final String description = "You are entering the cellar.";
+    Cellar() {
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+
+    public String toString(){
+        return "cellar";
+    }
+
+
+}
+//======================================================================================================
+//create Lava Room
+//======================================================================================================
+class LavaRoom extends Room{
+    private final String description  = "You are entering the lava room. ";
+    LavaRoom(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+
+    public String toString(){
+        return "lava room.";
+    }
+}
+
+//======================================================================================================
+//create Regeneration Room
+//======================================================================================================
+class RegenerationRoom extends Room{
+    private final String description = "You are entering the regenerating room.";
+    RegenerationRoom(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "regenerating room.";
+    }
+}
+
+//======================================================================================================
+//create Glacier Cave
+//======================================================================================================
+class GlacierCave extends Room{
+    private final String description = "You are entering the glacier cave.";
+    GlacierCave(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "glacier cave.";
+    }
+}
+
+//======================================================================================================
+//create Egypt Room
+//======================================================================================================
+class EgyptRoom extends Room{
+    private final String description = "You are entering the egypt room.";
+    EgyptRoom(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "Egypt room. ";
+    }
+}
+//======================================================================================================
+//create Coal Mine
+//======================================================================================================
+class CoalMine extends Room{
+    private final String description = "You are entering the coal mine.";
+    CoalMine(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "coal mine. ";
+    }
+}
+//======================================================================================================
+//create Blacksmith Workshop
+//======================================================================================================
+class BlacksmithWorkshop extends Room{
+    private final String description = "You are entering the Blacksmith Workshop.";
+    BlacksmithWorkshop(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "blacksmith workshop. ";
+    }
+}
+
+//======================================================================================================
+//create Troll Room
+//======================================================================================================
+class TrollRoom extends Room{
+    private final String description = "You are entering the Troll Room.";
+    TrollRoom(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "troll room. ";
+    }
+}
+
+//======================================================================================================
+//create Riddle Room
+//======================================================================================================
+class RiddleRoom extends Room{
+    private final String description = "You are entering the Riddle Room.";
+    RiddleRoom(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "riddle room. ";
+    }
+}
+
+//======================================================================================================
+//create Dragon's Lair
+//======================================================================================================
+class DragonLair extends Room{
+    private final String description = "You are entering the Dragon's Lair.";
+    DragonLair(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "dragon's lair. ";
+    }
+}
+//======================================================================================================
+//create Treasure Room
+//======================================================================================================
+class TreasureRoom extends Room{
+    private final String description = "You are entering the Treasure Room.";
+    TreasureRoom(){
+        super();
+        getDescription();
+    }
+    public String getDescription(){
+        return description;
+    }
+    public String toString(){
+        return "treasure room. ";
+    }
+}
 //======================================================================================================
 //create class MazeGame
 //======================================================================================================
@@ -292,6 +496,137 @@ class MazeGame { //this is where the factory for the zork game happens
         return aMaze;
     }
 }
+//=========================================================================================================
+//create an underground map
+//=========================================================================================================
+class ZorkUnderground extends MazeGame{
+    public Room makeRoom(String kindOfRoomUnderground){
+        if (kindOfRoomUnderground.equals("Cellar"))
+            return new Cellar();
+        else if (kindOfRoomUnderground.equals("LavaRoom"))
+            return new LavaRoom();
+        else if (kindOfRoomUnderground.equals("EgyptRoom"))
+            return new EgyptRoom();
+        else if (kindOfRoomUnderground.equals("CoalMine"))
+            return new CoalMine();
+        else if (kindOfRoomUnderground.equals("RegenerationRoom"))
+            return new RegenerationRoom();
+        else if (kindOfRoomUnderground.equals("GlacierCave"))
+            return new GlacierCave();
+        else if (kindOfRoomUnderground.equals("BlacksmithWorkshop"))
+            return new BlacksmithWorkshop();
+        else if (kindOfRoomUnderground.equals("TrollRoom"))
+            return new TrollRoom();
+        else if (kindOfRoomUnderground.equals("RiddleRoom"))
+            return new RiddleRoom();
+        else if (kindOfRoomUnderground.equals("DragonLair"))
+            return new DragonLair();
+        else if (kindOfRoomUnderground.equals("TreasureRoom"))
+            return new TreasureRoom();
+        else
+            return new Room();
+    }
+    public Maze createMaze(){
+        Maze ZorkMazeUnderground = makeMaze();
+
+        Room newCellar = makeRoom("Cellar");
+        Room newLavaRoom = makeRoom("LavaRoom");
+        Room newEgyptRoom = makeRoom("EgyptRoom");
+        Room newRegenerationRoom = makeRoom("RegenerationRoom");
+        Room newCoalMine = makeRoom("CoalMine");
+        Room newBlacksmithWorkshop = makeRoom("BlacksmithWorkshop");
+        Room newGlacierCave = makeRoom("GlacierCave");
+        Room newTrollRoom = makeRoom("TrollRoom");
+        Room newRiddleRoom = makeRoom("RiddleRoom");
+        Room newDragonLair = makeRoom("DragonLair");
+        Room newTreasureRoom = makeRoom("TreasureRoom");
+
+        Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom);
+        Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom);
+        Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom);
+        Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine);
+        Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine);
+        Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave);
+        Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop);
+        Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop);
+        Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom);
+        Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom);
+        Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair);
+        Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom);
+
+        ZorkMazeUnderground.addRoom(newCellar);
+        ZorkMazeUnderground.addRoom(newLavaRoom);
+
+        //setting sides for cellar
+        newCellar.setSide(Direction.North, makeWall());
+        newCellar.setSide(Direction.South, makeWall());
+        newCellar.setSide(Direction.East, makeWall());
+        newCellar.setSide(Direction.West, newCellarAndLavaRoomDoor);
+
+        //setting sides for lava room
+        newLavaRoom.setSide(Direction.North, newLavaRoomAndEgyptRoomDoor);
+        newLavaRoom.setSide(Direction.South, makeWall());
+        newLavaRoom.setSide(Direction.East, newCellarAndLavaRoomDoor);
+        newLavaRoom.setSide(Direction.West, makeWall());
+
+        //setting sides for egypt room
+        newEgyptRoom.setSide(Direction.North, newEgyptRoomAndRegenerationRoomDoor);
+        newEgyptRoom.setSide(Direction.South, newLavaRoomAndEgyptRoomDoor);
+        newEgyptRoom.setSide(Direction.East, newEgyptRoomAndCoalMineDoor);
+        newEgyptRoom.setSide(Direction.West, makeWall());
+
+        //setting sides for regeneration room
+        newRegenerationRoom.setSide(Direction.North, makeWall());
+        newRegenerationRoom.setSide(Direction.South, newRegenerationRoomAndCoalMineDoor);
+        newRegenerationRoom.setSide(Direction.East, newRegenerationRoomAndGlacierCaveDoor);
+        newRegenerationRoom.setSide(Direction.West, newEgyptRoomAndRegenerationRoomDoor);
+
+        //setting sides for coal mine
+        newCoalMine.setSide(Direction.North, newRegenerationRoomAndCoalMineDoor);
+        newCoalMine.setSide(Direction.South, makeWall());
+        newCoalMine.setSide(Direction.East, newCoalMineAndBlacksmithWorkshopDoor);
+        newCoalMine.setSide(Direction.West, newEgyptRoomAndCoalMineDoor);
+
+        //setting sides for glacier cave
+        newGlacierCave.setSide(Direction.North, makeWall());
+        newGlacierCave.setSide(Direction.South, newGlacierCaveAndBlacksmithWorkshopDoor);
+        newGlacierCave.setSide(Direction.East, newGlacierCaveAndTrollRoomDoor);
+        newGlacierCave.setSide(Direction.West, newRegenerationRoomAndGlacierCaveDoor);
+
+        //setting sides for blacksmithWorkshop
+        newBlacksmithWorkshop.setSide(Direction.North, newGlacierCaveAndBlacksmithWorkshopDoor);
+        newBlacksmithWorkshop.setSide(Direction.South, makeWall());
+        newBlacksmithWorkshop.setSide(Direction.East, newGlacierCaveAndTrollRoomDoor);
+        newBlacksmithWorkshop.setSide(Direction.West, newCoalMineAndBlacksmithWorkshopDoor);
+
+        //setting sides for troll room
+        newTrollRoom.setSide(Direction.North, makeWall());
+        newTrollRoom.setSide(Direction.South, newTrollRoomAndRiddleRoomDoor);
+        newTrollRoom.setSide(Direction.East, makeWall());
+        newTrollRoom.setSide(Direction.West, newGlacierCaveAndTrollRoomDoor);
+
+        //setting sides for riddle room
+        newRiddleRoom.setSide(Direction.North, newTrollRoomAndRiddleRoomDoor);
+        newRiddleRoom.setSide(Direction.South, newRiddleRoomAndDragonLairDoor);
+        newRiddleRoom.setSide(Direction.East, makeWall());
+        newRiddleRoom.setSide(Direction.West, makeWall());
+
+        //setting sides for dragon lair
+        newDragonLair.setSide(Direction.North, newRiddleRoomAndDragonLairDoor);
+        newDragonLair.setSide(Direction.South, makeWall());
+        newDragonLair.setSide(Direction.East, makeWall());
+        newDragonLair.setSide(Direction.West, newDragonLairAndTreasureRoomDoor);
+
+        //setting sides for treasure room
+        newTreasureRoom.setSide(Direction.North, makeWall());
+        newTreasureRoom.setSide(Direction.South, makeWall());
+        newTreasureRoom.setSide(Direction.East, newDragonLairAndTreasureRoomDoor);
+        newTreasureRoom.setSide(Direction.West, makeWall());
+
+
+        return ZorkMazeUnderground;
+    }
+}
 
 //=========================================================================================================
 //create a livingRoomAndKitchenMaze
@@ -300,7 +635,7 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
         if(kindOfRoom.equals("LivingRoom"))
-            return new LivingRoom();
+            return new LivingRoom(new ZorkUnderground());
         else if(kindOfRoom.equals("Kitchen"))
             return new Kitchen();
             //we need to put more else if every time we create the new room...........
