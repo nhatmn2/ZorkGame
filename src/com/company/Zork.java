@@ -269,7 +269,7 @@ class LivingRoom extends Room {
     public String toString() {
         return "living room";
     }
-    
+
     public void getCommand(List<String> words) {
         //check if the incoming list of strings is empty
         if(words.isEmpty())
@@ -403,7 +403,7 @@ class Attic extends Room {
 //==========================================================================
 class GrassyFields extends Room implements WordParser{
     //we're gonna have to implement a getCommand and a putWordsTogether function in each room
-    
+
     //checks if the list is null, then passes the list to another function
     List<String> list = new ArrayList<String>();
 
@@ -472,8 +472,9 @@ class GrassyFields extends Room implements WordParser{
         //if the command is "open door" then the player will end up in the living room
         //still trying to figure out how that is going to work
         //player class can be updated in this function to keep track of process
+        MazeGame mazeGame = new MazeGame();
         if(words.contains("OPEN") && words.contains("DOOR")) {
-            LivingRoom livingRoom = new LivingRoom();
+            LivingRoom livingRoom = new LivingRoom(mazeGame);
             //create another starting point in the living room class
         }
         else {
@@ -837,8 +838,9 @@ abstract interface WordParser {
 class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the rooms together
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
+        MazeGame mazeGame = new MazeGame();
         if(kindOfRoom.equals("LivingRoom"))
-            return new LivingRoom();
+            return new LivingRoom(mazeGame);
         else if(kindOfRoom.equals("Kitchen"))
             return new Kitchen();
             //we need to put more else if every time we create the new room...........
@@ -921,7 +923,7 @@ public class Zork{
     }
 
     public static void StartGame() {
-        KeyWords key = new KeyWords();
+        GrassyFields grassyFields = new GrassyFields();
         Scanner scan = new Scanner(System.in);
 
         String input;
@@ -934,6 +936,6 @@ public class Zork{
 
         List<String> list = Arrays.asList(words);
 
-        key.getCommand(list);
+        grassyFields.getCommand(list);
     }
 }
