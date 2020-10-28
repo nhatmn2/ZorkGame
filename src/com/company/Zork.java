@@ -105,7 +105,7 @@ class Room extends MapSite {
     //constructor for room
     public Room() {
         roomNumber = roomCount++;
-        System.out.println("creating room number " + roomNumber);
+        //System.out.println("creating room number " + roomNumber);
     }
 
     //method setSide() inside Room
@@ -122,7 +122,7 @@ class Room extends MapSite {
         else if (d == Direction.West){
             westSide = site;
         }
-        System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
+        //System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
     }
 
     //method getSide() inside Room
@@ -148,7 +148,7 @@ class Room extends MapSite {
     }
 
     void enter(){
-        System.out.println("enter to Room " + roomNumber);
+        //System.out.println("enter to Room " + roomNumber);
     }
 
 }
@@ -163,7 +163,7 @@ class Wall extends MapSite{
     //constructor for wall
     public Wall(){
         wallNumber = wallCount++;
-        System.out.println("creating Wall number" +  Integer.toString(wallNumber));
+        //System.out.println("creating Wall number" +  Integer.toString(wallNumber));
     }
     //method toString() inside Wall
     public String toString(){
@@ -188,7 +188,7 @@ class Door extends MapSite{
     //constructor for door
     public Door(Room r1, Room r2){
         doorNumber = doorCount++;
-        System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
+        //System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
         this.room1 = r1;
         this.room2 = r2;
     }
@@ -387,18 +387,6 @@ class LivingRoom extends Room implements WordParser {
     }
 }
 
-//=====================================================================================================
-//create livingRoom's door
-//=====================================================================================================
-//
-//class LivingRoomDoor extends Door{
-//    LivingRoomDoor (Room r1, Room r2){
-//        super(r1, r2);
-//    }
-//    public String toString() {
-//        return super.toString();
-//    }
-//}
 
 //=====================================================================================================
 //create Kitchen
