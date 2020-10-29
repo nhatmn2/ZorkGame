@@ -260,7 +260,7 @@ class ItemList {
 class LivingRoom extends Room implements WordParser {
     //create livingRoom with tools
     private MazeGame underground;
-    private final String description = "You are entering the living room. In here you can find all the tool you need for your journey";
+    private final String description = "You are entering the living room. In here you can find all the tool you need for your journey\n";
     //when the livingRoom is created the livingRoomItemList is also created
     LivingRoom(MazeGame newMaze) {
         super();
@@ -283,6 +283,34 @@ class LivingRoom extends Room implements WordParser {
         return "living room";
     }
 
+    public void startingPoint() {
+        Scanner scan = new Scanner(System.in);
+        boolean running = true;
+        String input = "";
+        String words[];
+
+        System.out.println("You see a hatch on the ground and another door leading to the kitchen.");
+        while(running) {
+            System.out.println("Where do you want to go?");
+            System.out.print(">");
+            input = scan.nextLine().toUpperCase();
+
+            words = input.split(" "); //split by the spaces read in
+            List<String> list = Arrays.asList(words);
+
+            if(input.isEmpty()) {
+                System.out.println("Please input a command.\n");
+            }
+            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
+                putWordsTogether(list);
+                //here will update the players location
+                //since there are items here, update the sack if the player picks up any
+                running = false;
+            }
+
+        }
+    }
+
     public void getCommand(List<String> words) {
         //check if the incoming list of strings is empty
         if(words.isEmpty())
@@ -292,8 +320,10 @@ class LivingRoom extends Room implements WordParser {
         checkLegitCommand(words);
     }
 
-    public void checkLegitCommand(List<String> words) {
+            //void
+    public boolean checkLegitCommand(List<String> words) {
         List<String> keywords = new ArrayList<String>();
+        boolean legitCommand = false;
 
         //check for actions(verbs)
         for(int i = 0; i < actions.length; ++i) {
@@ -332,8 +362,17 @@ class LivingRoom extends Room implements WordParser {
             }
         }
 
+        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
+            legitCommand = true;
+        }
+        else {
+            legitCommand = false;
+        }
+
         //pass the keywords to the final class to determine the final action
-        putWordsTogether(keywords);
+        //putWordsTogether(keywords);
+
+        return legitCommand;
     }
 
     public void putWordsTogether(List<String> words) {
@@ -428,18 +467,57 @@ class GrassyFields extends Room implements WordParser{
 
     public String toString() { return "grassy field"; }
 
+    //the true starting point
+    public void startingPoint() {
+        Scanner scan = new Scanner(System.in);
+
+        String input = "";
+        String words[];
+        boolean running = true;
+
+        //loop to keep asking what the player wants to do
+        //changed the code for checkLegitCommand to return a boolean if it found a combination of words
+        //if it returns a true, then it will pass it into the putWordsTogether method to determine the action
+        System.out.println("You wake up in front of a house.");
+        while(running) {
+            System.out.println("Where do you want to go?");
+            System.out.print(">");
+            input = scan.nextLine().toUpperCase();
+
+            words = input.split(" "); //split by the spaces read in
+            List<String> list = Arrays.asList(words);
+
+            if(input.isEmpty()) {
+                System.out.println("Please input a command.\n");
+            }
+            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
+                putWordsTogether(list);
+                //also update the players location
+                running = false;
+            }
+
+        }
+
+        /*words = input.split(" "); //split by the spaces read in
+        List<String> list = Arrays.asList(words);*/
+
+        //getCommand(list);
+    }
+
     //checks if the list is null, then passes the list to another function
-    public void getCommand(List<String> words) {
+    /*public void getCommand(List<String> words) {
         //check if the incoming list of strings is empty
         if(words.isEmpty())
         {
             System.out.println("Please input a command.");
         }
         checkLegitCommand(words);
-    }
+    }*/
 
-    public void checkLegitCommand(List<String> words) {
+            //void
+    public boolean checkLegitCommand(List<String> words) {
         List<String> keywords = new ArrayList<String>();
+        boolean legitCommand = false;
 
         //check for actions(verbs)
         for(int i = 0; i < actions.length; ++i) {
@@ -478,8 +556,17 @@ class GrassyFields extends Room implements WordParser{
             }
         }
 
+        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
+            legitCommand = true;
+        }
+        else {
+            legitCommand = false;
+        }
+
         //pass the keywords to the final class to determine the final action
-        putWordsTogether(keywords);
+        //putWordsTogether(keywords);
+
+        return legitCommand;
     }
 
     public void putWordsTogether(List<String> words) {
@@ -490,6 +577,7 @@ class GrassyFields extends Room implements WordParser{
             ZorkUnderground zorkUnderground = new ZorkUnderground();
             LivingRoom livingRoom = new LivingRoom(zorkUnderground);
             //create another starting point in the living room class
+            livingRoom.startingPoint();
         }
         else {
 
@@ -842,7 +930,8 @@ class ZorkUnderground extends MazeGame{
 // Interface WordParser
 //=============================================================================
 abstract interface WordParser {
-    public void checkLegitCommand(List<String> words);
+    //public void checkLegitCommand(List<String> words);
+    public boolean checkLegitCommand(List<String> words);
     abstract void putWordsTogether(List<String> words);
 }
 
@@ -938,18 +1027,7 @@ public class Zork{
 
     public static void StartGame() {
         GrassyFields grassyFields = new GrassyFields();
-        Scanner scan = new Scanner(System.in);
 
-        String input;
-        String words[];
-
-        System.out.println("You wake up in front of a house. Where do you want to go?");
-        System.out.print(">");
-        input = scan.nextLine().toUpperCase();
-        words = input.split(" "); //split by teh spaces read in
-
-        List<String> list = Arrays.asList(words);
-
-        grassyFields.getCommand(list);
+        grassyFields.startingPoint();
     }
 }
