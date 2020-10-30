@@ -48,19 +48,20 @@ abstract class MapSite{
 //============================================================================================================
 
 class Room extends MapSite {
-    public static int visit = 0;
+    public static int kitchenVisit = 0;
+    public static int atticVisit = 0;
     //this is for the word parsing for each room
     //keywords for directions
     String[] directions = {
             "NORTH", "SOUTH", "EAST", "WEST", "FORWARD", "BACKWARDS",
             "LEFT", "RIGHT", "UPSTAIRS", "DOWNSTAIRS", "CELLAR", "WINDOW", //the window is basically go forward or go north
-            "DOOR", "KITCHEN"
+            "DOOR", "KITCHEN", "ROOM"
     };
 
     //keywords for actions
     String[] actions = {
             "ATTACK", "SEARCH", "UNLOCK", "JUMP", "TAKE", "LOOK", "GO", "OPEN",
-            "INVENTORY", "OPEN", "SAVE"
+            "INVENTORY", "OPEN", "SAVE", "LOOK", "AROUND", "EXAMINE"
     };
 
     //Might need an array of items
@@ -291,8 +292,10 @@ class LivingRoom extends Room implements WordParser {
         String input = "";
         String words[];
 
-        System.out.println("The door shut. You are now locked inside.");
-        System.out.println("You see a hatch on the ground and another door leading to the kitchen.");
+
+        //when player types "look around" then give the description of
+        //the hatch on the floor and the door leading to the kitchen
+        System.out.println("You are now in the living room.");
         while(running) {
             System.out.println("Where do you want to go?");
             System.out.print(">");
@@ -421,6 +424,7 @@ class Kitchen extends Room {
         kitchenItemList.addItems("Garlic");
         kitchenItemList.addItems("Bottle of water");
         kitchenItemList.showItemList();
+        kitchenVisit++; //this will keep count of the room visits for the kitchen
     }
 
     public String getDescription() {
@@ -439,7 +443,7 @@ class Kitchen extends Room {
 
         //this is just a test dialogue to see if it would change depending
         //on the number of times you've visited the room
-        if(visit <= 0) {
+        if(kitchenVisit <= 0) {
             System.out.println("You are now in the kitchen. Might find something useful here if you look around.");
             System.out.println("You see stairs leading up to the attic.");
         }
@@ -460,7 +464,6 @@ class Kitchen extends Room {
             }
             else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
                 putWordsTogether(list); //most likely another check if else here to check if they input a valid command or not
-                ++visit;
                 //here will update the players location
                 //since there are items here, update the sack if the player picks up any
                 running = false;
@@ -563,6 +566,7 @@ class Attic extends Room {
         atticItemList.addItems("Brick");
         atticItemList.addItems("Axe");
         atticItemList.showItemList(); //just to test whether the items are showing up
+        atticVisit++; //keeps track of how many times the player has visited the attic
     }
     public String getDescription() {
         return description;
@@ -576,6 +580,13 @@ class Attic extends Room {
         String input = "";
         String words[];
 
+        if(atticVisit <= 0) {
+            System.out.println("You are now in the" + toString() + ".");
+            System.out.println("As light shines down in the room, you see something shining in the corner of the room.");
+        }
+        else {
+            System.out.println("You are now back in the " + toString() + ".");
+        }
         System.out.println("You are now in the " + toString() + ".");
         while(running) {
             System.out.println("Where do you want to go?");
