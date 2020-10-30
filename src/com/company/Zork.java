@@ -289,6 +289,7 @@ class LivingRoom extends Room implements WordParser {
         String input = "";
         String words[];
 
+        System.out.println("The door shut. You are now locked inside.");
         System.out.println("You see a hatch on the ground and another door leading to the kitchen.");
         while(running) {
             System.out.println("Where do you want to go?");
@@ -486,6 +487,7 @@ class GrassyFields extends Room implements WordParser{
 
             words = input.split(" "); //split by the spaces read in
             List<String> list = Arrays.asList(words);
+            //most likely pass the list to the player class before it is gone
 
             if(input.isEmpty()) {
                 System.out.println("Please input a command.\n");
