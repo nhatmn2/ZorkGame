@@ -21,25 +21,51 @@ final class Direction {
         return directionName;
     }
 }
-
-//============================================================================
-// Player Class
-//============================================================================
-class Player {
-    private int health = 100;
-    private String[] sack = new String[10];
-    private String position;
-
-
-
-}
-
 //============================================================================================================
 //create an abstract super class MapSite
 //============================================================================================================
 
 abstract class MapSite{
+    private String name;
+    private String description;
+
+    public String getName() {return  name;}
+    public void setName(String newName){ this.name = newName;}
+
+    public String getDescription() {return description; }
+    public void setDescription(String newDescription){this.description = newDescription; }
+
     abstract void enter();
+}
+
+//============================================================================
+// Player Class
+//============================================================================
+class Player extends MapSite {
+    private int health;
+    private String[] sack;
+    private Room roomPosition;  //the room at which the player present
+    //private String name; //I leave it hear if you want to have the player's name
+
+
+    //constructor for creating the player
+    public Player(Room startRoom){
+        this.health = 100;
+        this.sack = new String[10];
+        this.roomPosition = startRoom;
+    }
+
+    //this function is used to get the player position (i.e in what room)
+    public Room getPosition() {
+        return roomPosition;
+    }
+
+    //this function is used to set the player position
+    public void setRoom (Room destinationRoom){
+        this.roomPosition = destinationRoom;
+    }
+
+    public void enter() { }
 }
 
 //============================================================================================================
@@ -105,7 +131,7 @@ class Room extends MapSite {
     //constructor for room
     public Room() {
         roomNumber = roomCount++;
-        //System.out.println("creating room number " + roomNumber);
+        System.out.println("creating room number " + roomNumber);
     }
 
     //method setSide() inside Room
@@ -122,7 +148,7 @@ class Room extends MapSite {
         else if (d == Direction.West){
             westSide = site;
         }
-        //System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
+        System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
     }
 
     //method getSide() inside Room
@@ -148,7 +174,7 @@ class Room extends MapSite {
     }
 
     void enter(){
-        //System.out.println("enter to Room " + roomNumber);
+        System.out.println("enter to Room " + roomNumber);
     }
 
 }
@@ -163,7 +189,7 @@ class Wall extends MapSite{
     //constructor for wall
     public Wall(){
         wallNumber = wallCount++;
-        //System.out.println("creating Wall number" +  Integer.toString(wallNumber));
+        System.out.println("creating Wall number" +  Integer.toString(wallNumber));
     }
     //method toString() inside Wall
     public String toString(){
@@ -188,7 +214,7 @@ class Door extends MapSite{
     //constructor for door
     public Door(Room r1, Room r2){
         doorNumber = doorCount++;
-        //System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
+        System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
         this.room1 = r1;
         this.room2 = r2;
     }
@@ -320,7 +346,7 @@ class LivingRoom extends Room implements WordParser {
         checkLegitCommand(words);
     }
 
-            //void
+    //void
     public boolean checkLegitCommand(List<String> words) {
         List<String> keywords = new ArrayList<String>();
         boolean legitCommand = false;
@@ -387,6 +413,18 @@ class LivingRoom extends Room implements WordParser {
     }
 }
 
+//=====================================================================================================
+//create livingRoom's door
+//=====================================================================================================
+//
+//class LivingRoomDoor extends Door{
+//    LivingRoomDoor (Room r1, Room r2){
+//        super(r1, r2);
+//    }
+//    public String toString() {
+//        return super.toString();
+//    }
+//}
 
 //=====================================================================================================
 //create Kitchen
@@ -502,7 +540,7 @@ class GrassyFields extends Room implements WordParser{
         checkLegitCommand(words);
     }*/
 
-            //void
+    //void
     public boolean checkLegitCommand(List<String> words) {
         List<String> keywords = new ArrayList<String>();
         boolean legitCommand = false;
@@ -923,6 +961,7 @@ abstract interface WordParser {
     abstract void putWordsTogether(List<String> words);
 }
 
+
 //=========================================================================================================
 //create a livingRoomAndKitchenMaze
 //=========================================================================================================
@@ -1015,7 +1054,7 @@ public class Zork{
 
     public static void StartGame() {
         GrassyFields grassyFields = new GrassyFields();
-
         grassyFields.startingPoint();
+
     }
 }
