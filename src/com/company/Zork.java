@@ -21,6 +21,19 @@ final class Direction {
         return directionName;
     }
 }
+
+//============================================================================
+// Player Class
+//============================================================================
+class Player {
+    private int health = 100;
+    private String[] sack = new String[10];
+    private String position;
+
+
+
+}
+
 //============================================================================================================
 //create an abstract super class MapSite
 //============================================================================================================
@@ -92,7 +105,7 @@ class Room extends MapSite {
     //constructor for room
     public Room() {
         roomNumber = roomCount++;
-        //System.out.println("creating room number " + roomNumber);
+        System.out.println("creating room number " + roomNumber);
     }
 
     //method setSide() inside Room
@@ -109,7 +122,7 @@ class Room extends MapSite {
         else if (d == Direction.West){
             westSide = site;
         }
-        //System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
+        System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
     }
 
     //method getSide() inside Room
@@ -135,7 +148,7 @@ class Room extends MapSite {
     }
 
     void enter(){
-        //System.out.println("enter to Room " + roomNumber);
+        System.out.println("enter to Room " + roomNumber);
     }
 
 }
@@ -150,7 +163,7 @@ class Wall extends MapSite{
     //constructor for wall
     public Wall(){
         wallNumber = wallCount++;
-        //System.out.println("creating Wall number" +  Integer.toString(wallNumber));
+        System.out.println("creating Wall number" +  Integer.toString(wallNumber));
     }
     //method toString() inside Wall
     public String toString(){
@@ -175,7 +188,7 @@ class Door extends MapSite{
     //constructor for door
     public Door(Room r1, Room r2){
         doorNumber = doorCount++;
-        //System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
+        System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
         this.room1 = r1;
         this.room2 = r2;
     }
@@ -239,15 +252,6 @@ class ItemList {
         }
     }
 }
-
-//======================================================================================================
-// Starting point Interface
-//===========================================================================
-interface RoomTracker {
-    public void startingPoint();
-    public void itemsTakenOrNot();
-}
-
 
 //======================================================================================================
 //create livingRoom
@@ -336,6 +340,7 @@ class LivingRoom extends Room implements WordParser {
         //here will be actions leading to either the cellar or the kitchen
         if(words.contains("GO") && words.contains("KITCHEN")) {
             //player will end up in the kitchen
+            Kitchen kitchen = new Kitchen();
         }
         else {
 
@@ -343,6 +348,18 @@ class LivingRoom extends Room implements WordParser {
     }
 }
 
+//=====================================================================================================
+//create livingRoom's door
+//=====================================================================================================
+//
+//class LivingRoomDoor extends Door{
+//    LivingRoomDoor (Room r1, Room r2){
+//        super(r1, r2);
+//    }
+//    public String toString() {
+//        return super.toString();
+//    }
+//}
 
 //=====================================================================================================
 //create Kitchen
@@ -468,7 +485,7 @@ class GrassyFields extends Room implements WordParser{
     public void putWordsTogether(List<String> words) {
         //if the command is "open door" then the player will end up in the living room
         //still trying to figure out how that is going to work
-        //player class can be updated in this function to keep track of process
+        //player class can be updated in this function to keep track of proces
         if(words.contains("OPEN") && words.contains("DOOR")) {
             ZorkUnderground zorkUnderground = new ZorkUnderground();
             LivingRoom livingRoom = new LivingRoom(zorkUnderground);
@@ -835,7 +852,7 @@ abstract interface WordParser {
 class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the rooms together
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
-        ZorkUnderground zorkUnderground = new ZorkUnderground(); 
+        ZorkUnderground zorkUnderground = new ZorkUnderground();
         if(kindOfRoom.equals("LivingRoom"))
             return new LivingRoom(zorkUnderground);
         else if(kindOfRoom.equals("Kitchen"))
