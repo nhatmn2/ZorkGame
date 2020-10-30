@@ -22,32 +22,10 @@ final class Direction {
     }
 }
 
-//============================================================================
-// Player Class
-//============================================================================
-class Player {
-    private int health = 100;
-    private String[] sack = new String[10];
-    private String position;
-
-
-
-}
-
-//============================================================================================================
-//create an abstract super class MapSite
-//============================================================================================================
-
-abstract class MapSite{
-    abstract void enter();
-}
-
-
-//============================================================================================================
-//create a class Room
-//============================================================================================================
-
-class Room extends MapSite {
+//====================================================================
+// Starting Point
+//====================================================================
+class StartingPoints implements WordParser {
     public static int kitchenVisit = 0;
     public static int atticVisit = 0;
     //this is for the word parsing for each room
@@ -55,7 +33,7 @@ class Room extends MapSite {
     String[] directions = {
             "NORTH", "SOUTH", "EAST", "WEST", "FORWARD", "BACKWARDS",
             "LEFT", "RIGHT", "UPSTAIRS", "DOWNSTAIRS", "CELLAR", "WINDOW", //the window is basically go forward or go north
-            "DOOR", "KITCHEN", "ROOM"
+            "DOOR", "KITCHEN", "ROOM", "LIVINGROOM"
     };
 
     //keywords for actions
@@ -73,10 +51,25 @@ class Room extends MapSite {
     private String action;
     private String item;
 
-
     private boolean bDirection; //the 'b' just means boolean
     private boolean bAction;
     boolean bItem;
+
+    GrassyFields grassyFields = new GrassyFields();
+    LivingRoom livingRoom = new LivingRoom();
+    Attic attic = new Attic();
+
+    Scanner scan;
+
+    String input = "";
+    String words[];
+    boolean running;
+
+    StartingPoints() {
+        scan = new Scanner(System.in);
+        input = "";
+        running = true;
+    }
 
     //accessors
     public String getDirection() { return direction; }
@@ -96,6 +89,125 @@ class Room extends MapSite {
     public void setAction(String action) { this.action = action; }
     public void setItem(String item) { this.item = item; }
 
+    //actual starting point
+    public void grassyFieldsStart() {
+        boolean running = true;
+
+        System.out.println("You are now in a " + grassyFields.getDescription());
+        while(running) {
+            System.out.println("What do you want to do? ");
+            System.out.print(">");
+            input = scan.nextLine().toUpperCase();
+            words = input.split(" "); //split by the spaces read in
+            List<String> list = Arrays.asList(words);
+            //most likely pass the list to the player class before it is gone
+
+            if(input.isEmpty()) {
+                System.out.println("Please input a command.\n");
+            }
+            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
+                if(putWordsTogether(list)) { //this is to check if they input any of the keywords
+
+
+                    running = false;
+                }
+                else if(!putWordsTogether(list)){
+                    System.out.println("Pleas input a valid command.");
+                    continue;
+                }
+            }
+        }
+    }
+
+    //void
+    public boolean checkLegitCommand(List<String> words) {
+        List<String> keywords = new ArrayList<String>();
+        boolean legitCommand = false;
+
+        //check for actions(verbs)
+        for(int i = 0; i < actions.length; ++i) {
+            if(words.contains(actions[i])) {
+                System.out.println("Found action! " + actions[i]);
+                setBAction(true);
+
+                setAction(actions[i]);
+
+                keywords.add(getAction());
+            }
+        }
+
+        //check for directions
+        for(int i = 0; i < directions.length; ++i) {
+            //this shit works
+            if(words.contains(directions[i])) {
+                System.out.println("Found direction! " + directions[i]);
+                setBDirection(true); //you have to access the actual variable
+                //this.bDirection = true;
+
+                setDirection(directions[i]);
+
+                keywords.add(getDirection());
+            }
+        }
+
+        //check for items
+        for(int i = 0; i < items.length; ++i) {
+            if(words.contains(items[i])) {
+                System.out.println("Found item! " + items[i]);
+                setBItem(true);
+                setItem(items[i]);
+
+                keywords.add(getItem());
+            }
+        }
+
+        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
+            legitCommand = true;
+        }
+        else {
+            legitCommand = false;
+        }
+
+        //pass the keywords to the final class to determine the final action
+        //putWordsTogether(keywords);
+
+        return legitCommand;
+    }
+
+    public boolean putWordsTogether(List<String> words) {
+        boolean x;
+        //if the command is "open door" then the player will end up in the living room
+        //still trying to figure out how that is going to work
+        //player class can be updated in this function to keep track of proces
+        if(words.contains("OPEN") && words.contains("DOOR")) {
+            //create another starting point in the living room class
+            x = true;
+        }
+        else {
+            //idk what to put here yet
+            x = false;
+        }
+
+
+        return x;
+    }
+}
+
+
+//============================================================================================================
+//create an abstract super class MapSite
+//============================================================================================================
+
+abstract class MapSite{
+    abstract void enter();
+}
+
+
+//============================================================================================================
+//create a class Room
+//============================================================================================================
+
+class Room extends MapSite {
     //this is for the room itself
     private int roomNumber;
     //this field is for the const starting room
@@ -260,15 +372,15 @@ class ItemList {
 //create livingRoom
 //======================================================================================================
 
-class LivingRoom extends Room implements WordParser {
+class LivingRoom extends Room {
     //create livingRoom with tools
     private MazeGame underground;
     private final String description = "You are entering the living room. In here you can find all the tool you need for your journey\n";
     //when the livingRoom is created the livingRoomItemList is also created
-    LivingRoom(MazeGame newMaze) {
+    LivingRoom() {
         super();
         //I created another underground Maze after you enter the cellar.
-        this.underground = newMaze;
+        //this.underground = newMaze;
         //System.out.println(description);
         //this is for creating item list inside living room!
         getDescription();
@@ -284,114 +396,6 @@ class LivingRoom extends Room implements WordParser {
     }
     public String toString() {
         return "living room";
-    }
-
-    public void startingPoint() {
-        Scanner scan = new Scanner(System.in);
-        boolean running = true;
-        String input = "";
-        String words[];
-
-
-        //when player types "look around" then give the description of
-        //the hatch on the floor and the door leading to the kitchen
-        System.out.println("You are now in the living room.");
-        while(running) {
-            System.out.println("Where do you want to go?");
-            System.out.print(">");
-            input = scan.nextLine().toUpperCase();
-
-            words = input.split(" "); //split by the spaces read in
-            List<String> list = Arrays.asList(words);
-            //pass the players action here to the player class
-
-            if(input.isEmpty()) {
-                System.out.println("Please input a command.\n");
-            }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                putWordsTogether(list);
-                //here will update the players location
-                //since there are items here, update the sack if the player picks up any
-                running = false;
-            }
-
-        }
-    }
-
-    public void getCommand(List<String> words) {
-        //check if the incoming list of strings is empty
-        if(words.isEmpty())
-        {
-            System.out.println("Please input a command.");
-        }
-        checkLegitCommand(words);
-    }
-
-            //void
-    public boolean checkLegitCommand(List<String> words) {
-        List<String> keywords = new ArrayList<String>();
-        boolean legitCommand = false;
-
-        //check for actions(verbs)
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                System.out.println("Found action! " + actions[i]);
-                setBAction(true);
-
-                setAction(actions[i]);
-
-                keywords.add(getAction());
-            }
-        }
-
-        //check for directions
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                System.out.println("Found direction! " + directions[i]);
-                setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
-
-                setDirection(directions[i]);
-
-                keywords.add(getDirection());
-            }
-        }
-
-        //check for items
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                System.out.println("Found item! " + items[i]);
-                setBItem(true);
-                setItem(items[i]);
-
-                keywords.add(getItem());
-            }
-        }
-
-        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
-            legitCommand = true;
-        }
-        else {
-            legitCommand = false;
-        }
-
-        //pass the keywords to the final class to determine the final action
-        //putWordsTogether(keywords);
-
-        return legitCommand;
-    }
-
-    public void putWordsTogether(List<String> words) {
-        //here will be actions leading to either the cellar or the kitchen
-        if(words.contains("GO") && words.contains("KITCHEN")) {
-            //player will end up in the kitchen
-            Kitchen kitchen = new Kitchen();
-            kitchen.startingPoint();
-        }
-        else {
-
-        }
     }
 }
 
@@ -424,7 +428,6 @@ class Kitchen extends Room {
         kitchenItemList.addItems("Garlic");
         kitchenItemList.addItems("Bottle of water");
         kitchenItemList.showItemList();
-        kitchenVisit++; //this will keep count of the room visits for the kitchen
     }
 
     public String getDescription() {
@@ -435,120 +438,8 @@ class Kitchen extends Room {
         return "kitchen";
     }
 
-    public void startingPoint() {
-        Scanner scan = new Scanner(System.in);
-        boolean running = true;
-        String input = "";
-        String words[];
-
-        //this is just a test dialogue to see if it would change depending
-        //on the number of times you've visited the room
-        if(kitchenVisit <= 0) {
-            System.out.println("You are now in the kitchen. Might find something useful here if you look around.");
-            System.out.println("You see stairs leading up to the attic.");
-        }
-        else {
-            System.out.println("You are now back in the " + toString() + ".");
-        }
-        while(running) {
-            System.out.println("Where do you want to go?");
-            System.out.print(">");
-            input = scan.nextLine().toUpperCase();
-
-            words = input.split(" "); //split by the spaces read in
-            List<String> list = Arrays.asList(words);
-            //pass the players action here to the player class
-
-            if(input.isEmpty()) {
-                System.out.println("Please input a command.\n");
-            }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                putWordsTogether(list); //most likely another check if else here to check if they input a valid command or not
-                //here will update the players location
-                //since there are items here, update the sack if the player picks up any
-                running = false;
-            }
-
-        }
-    }
-
-    public void getCommand(List<String> words) {
-        //check if the incoming list of strings is empty
-        if(words.isEmpty())
-        {
-            System.out.println("Please input a command.");
-        }
-        checkLegitCommand(words);
-    }
-
-    //void
-    public boolean checkLegitCommand(List<String> words) {
-        List<String> keywords = new ArrayList<String>();
-        boolean legitCommand = false;
-
-        //check for actions(verbs)
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                System.out.println("Found action! " + actions[i]);
-                setBAction(true);
-
-                setAction(actions[i]);
-
-                keywords.add(getAction());
-            }
-        }
-
-        //check for directions
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                System.out.println("Found direction! " + directions[i]);
-                setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
-
-                setDirection(directions[i]);
-
-                keywords.add(getDirection());
-            }
-        }
-
-        //check for items
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                System.out.println("Found item! " + items[i]);
-                setBItem(true);
-                setItem(items[i]);
-
-                keywords.add(getItem());
-            }
-        }
-
-        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
-            legitCommand = true;
-        }
-        else {
-            legitCommand = false;
-        }
-
-        //pass the keywords to the final class to determine the final action
-        //putWordsTogether(keywords);
-
-        return legitCommand;
-    }
-
-    public void putWordsTogether(List<String> words) {
-        //here will be actions leading to either the cellar or the kitchen
-        if(words.contains("GO") && words.contains("UPSTAIRS"))
-        {
-            //player will end up in the kitchen
-            Attic attic = new Attic();
-            attic.startingPoint();
-        }
-        else {
-
-        }
-    }
 }
+
 //=======================================================================================================
 //create Attic
 //=======================================================================================================
@@ -566,261 +457,28 @@ class Attic extends Room {
         atticItemList.addItems("Brick");
         atticItemList.addItems("Axe");
         atticItemList.showItemList(); //just to test whether the items are showing up
-        atticVisit++; //keeps track of how many times the player has visited the attic
     }
     public String getDescription() {
         return description;
     }
 
     public String toString() { return "attic"; }
-
-    public void startingPoint() {
-        Scanner scan = new Scanner(System.in);
-        boolean running = true;
-        String input = "";
-        String words[];
-
-        if(atticVisit <= 0) {
-            System.out.println("You are now in the" + toString() + ".");
-            System.out.println("As light shines down in the room, you see something shining in the corner of the room.");
-        }
-        else {
-            System.out.println("You are now back in the " + toString() + ".");
-        }
-        System.out.println("You are now in the " + toString() + ".");
-        while(running) {
-            System.out.println("Where do you want to go?");
-            System.out.print(">");
-            input = scan.nextLine().toUpperCase();
-
-            words = input.split(" "); //split by the spaces read in
-            List<String> list = Arrays.asList(words);
-            //pass the players action here to the player class
-
-            if(input.isEmpty()) {
-                System.out.println("Please input a command.\n");
-            }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                putWordsTogether(list); //most likely another check if else here to check if they input a valid command or not
-                //here will update the players location
-                //since there are items here, update the sack if the player picks up any
-                running = false;
-            }
-
-        }
-    }
-
-    public void getCommand(List<String> words) {
-        //check if the incoming list of strings is empty
-        if(words.isEmpty())
-        {
-            System.out.println("Please input a command.");
-        }
-        checkLegitCommand(words);
-    }
-
-    //void
-    public boolean checkLegitCommand(List<String> words) {
-        List<String> keywords = new ArrayList<String>();
-        boolean legitCommand = false;
-
-        //check for actions(verbs)
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                System.out.println("Found action! " + actions[i]);
-                setBAction(true);
-
-                setAction(actions[i]);
-
-                keywords.add(getAction());
-            }
-        }
-
-        //check for directions
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                System.out.println("Found direction! " + directions[i]);
-                setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
-
-                setDirection(directions[i]);
-
-                keywords.add(getDirection());
-            }
-        }
-
-        //check for items
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                System.out.println("Found item! " + items[i]);
-                setBItem(true);
-                setItem(items[i]);
-
-                keywords.add(getItem());
-            }
-        }
-
-        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
-            legitCommand = true;
-        }
-        else {
-            legitCommand = false;
-        }
-
-        //pass the keywords to the final class to determine the final action
-        //putWordsTogether(keywords);
-
-        return legitCommand;
-    }
-
-    public void putWordsTogether(List<String> words) {
-        //here will be actions leading to either the cellar or the kitchen
-        if(words.contains("GO") && words.contains("DOWNSTAIRS"))
-        {
-            Kitchen kitchen = new Kitchen();
-            kitchen.startingPoint();
-        }
-        else {
-
-        }
-    }
 }
 
 //=====================================================================================================
 //Creating Starting Point/Grassy Fields
 //==========================================================================
-class GrassyFields extends Room implements WordParser{
+class GrassyFields extends Room{
     //we're gonna have to implement a getCommand and a putWordsTogether function in each room
-
-    List<String> list = new ArrayList<String>();
 
     private final String description = "You are in a grassy field.";
     GrassyFields() {
         super();
         System.out.println(description);
     }
+    public String getDescription() { return description; }
 
     public String toString() { return "grassy field"; }
-
-    //the true starting point
-    public void startingPoint() {
-        Scanner scan = new Scanner(System.in);
-
-        String input = "";
-        String words[];
-        boolean running = true;
-
-        //loop to keep asking what the player wants to do
-        //changed the code for checkLegitCommand to return a boolean if it found a combination of words
-        //if it returns a true, then it will pass it into the putWordsTogether method to determine the action
-        System.out.println("You wake up in front of a house.");
-        while(running) {
-            System.out.println("Where do you want to go?");
-            System.out.print(">");
-            input = scan.nextLine().toUpperCase();
-
-            words = input.split(" "); //split by the spaces read in
-            List<String> list = Arrays.asList(words);
-            //most likely pass the list to the player class before it is gone
-
-            if(input.isEmpty()) {
-                System.out.println("Please input a command.\n");
-            }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                putWordsTogether(list);
-                //also update the players location
-                running = false;
-            }
-
-        }
-
-        /*words = input.split(" "); //split by the spaces read in
-        List<String> list = Arrays.asList(words);*/
-
-        //getCommand(list);
-    }
-
-    //checks if the list is null, then passes the list to another function
-    /*public void getCommand(List<String> words) {
-        //check if the incoming list of strings is empty
-        if(words.isEmpty())
-        {
-            System.out.println("Please input a command.");
-        }
-        checkLegitCommand(words);
-    }*/
-
-            //void
-    public boolean checkLegitCommand(List<String> words) {
-        List<String> keywords = new ArrayList<String>();
-        boolean legitCommand = false;
-
-        //check for actions(verbs)
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                System.out.println("Found action! " + actions[i]);
-                setBAction(true);
-
-                setAction(actions[i]);
-
-                keywords.add(getAction());
-            }
-        }
-
-        //check for directions
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                System.out.println("Found direction! " + directions[i]);
-                setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
-
-                setDirection(directions[i]);
-
-                keywords.add(getDirection());
-            }
-        }
-
-        //check for items
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                System.out.println("Found item! " + items[i]);
-                setBItem(true);
-                setItem(items[i]);
-
-                keywords.add(getItem());
-            }
-        }
-
-        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
-            legitCommand = true;
-        }
-        else {
-            legitCommand = false;
-        }
-
-        //pass the keywords to the final class to determine the final action
-        //putWordsTogether(keywords);
-
-        return legitCommand;
-    }
-
-    public void putWordsTogether(List<String> words) {
-        //if the command is "open door" then the player will end up in the living room
-        //still trying to figure out how that is going to work
-        //player class can be updated in this function to keep track of proces
-        if(words.contains("OPEN") && words.contains("DOOR")) {
-            ZorkUnderground zorkUnderground = new ZorkUnderground();
-            LivingRoom livingRoom = new LivingRoom(zorkUnderground);
-            //create another starting point in the living room class
-            livingRoom.startingPoint();
-        }
-        else {
-            //idk what to put here yet
-        }
-    }
-
 }
 
 //=======================================================================================================
@@ -1169,7 +827,7 @@ class ZorkUnderground extends MazeGame{
 abstract interface WordParser {
     //public void checkLegitCommand(List<String> words);
     public boolean checkLegitCommand(List<String> words);
-    abstract void putWordsTogether(List<String> words);
+    abstract boolean putWordsTogether(List<String> words);
 }
 
 //=========================================================================================================
@@ -1178,9 +836,8 @@ abstract interface WordParser {
 class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the rooms together
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
-        ZorkUnderground zorkUnderground = new ZorkUnderground();
         if(kindOfRoom.equals("LivingRoom"))
-            return new LivingRoom(zorkUnderground);
+            return new LivingRoom();
         else if(kindOfRoom.equals("Kitchen"))
             return new Kitchen();
             //we need to put more else if every time we create the new room...........
@@ -1259,12 +916,10 @@ public class Zork{
 
         //most likely needs a loop here to check whether the game is finished or not
         StartGame();
-
     }
 
     public static void StartGame() {
-        GrassyFields grassyFields = new GrassyFields();
-
-        grassyFields.startingPoint();
+        StartingPoints startingPoint = new StartingPoints();
+        startingPoint.grassyFieldsStart();
     }
 }
