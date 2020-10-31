@@ -22,6 +22,51 @@ final class Direction {
     }
 }
 
+//==================================================================
+// Mapsite
+//==================================================================
+abstract class MapSite{
+    private String name;
+    private String description;
+
+    public String getName() {return  name;}
+    public void setName(String newName){ this.name = newName;}
+
+    public String getDescription() {return description; }
+    public void setDescription(String newDescription){this.description = newDescription; }
+
+    abstract void enter();
+}
+
+//==================================================================
+// Player Class
+//==================================================================
+class Player extends MapSite {
+    private int health;
+    private String[] sack;
+    private Room roomPosition;  //the room at which the player present
+    //private String name; //I leave it hear if you want to have the player's name
+
+
+    //constructor for creating the player
+    public Player(Room startRoom){
+        this.health = 100;
+        this.sack = new String[10];
+        this.roomPosition = startRoom;
+    }
+
+    //this function is used to get the player position (i.e in what room)
+    public Room getPosition() {
+        return roomPosition;
+    }
+
+    //this function is used to set the player position
+    public void setRoom (Room destinationRoom){
+        this.roomPosition = destinationRoom;
+    }
+
+    public void enter() { }
+}
 //====================================================================
 // Starting Point
 //====================================================================
@@ -60,7 +105,6 @@ class StartingPoints implements WordParser {
     Attic attic = new Attic();
 
     Scanner scan;
-
     String input = "";
     String words[];
     boolean running;
@@ -192,16 +236,6 @@ class StartingPoints implements WordParser {
         return x;
     }
 }
-
-
-//============================================================================================================
-//create an abstract super class MapSite
-//============================================================================================================
-
-abstract class MapSite{
-    abstract void enter();
-}
-
 
 //============================================================================================================
 //create a class Room
