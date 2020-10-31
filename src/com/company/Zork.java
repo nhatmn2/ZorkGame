@@ -1,10 +1,7 @@
 package src.com.company;
 //package com.company;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 final class Direction {
     private String directionName;
@@ -49,6 +46,8 @@ class Player extends MapSite {
     private int health;
     private String[] sack;
     private Room roomPosition;  //the room at which the player present
+    private Stack<Room> roomLog = new Stack<>(); //this is to keep track of the room player has visited
+
     //private String name; //I leave it hear if you want to have the player's name
 
 
@@ -58,7 +57,8 @@ class Player extends MapSite {
         this.health = 100;
         this.sack = new String[10];
         this.roomPosition = startRoom;
-        System.out.println(roomPosition);
+        this.roomLog.add(startRoom);
+        //System.out.println(roomPosition);
     }
 
     //this function is used to get the player position (i.e in what room)
@@ -71,7 +71,17 @@ class Player extends MapSite {
         this.roomPosition = destinationRoom;
     }
 
-    public void enter() { }
+    //check for this function
+    public void makePlayerMove(Door doorBetweenRooms){
+        this.roomPosition = doorBetweenRooms.getDestinationRoom() ;
+        if(!roomLog.contains(doorBetweenRooms.getDestinationRoom()))
+            roomLog.pop();
+        else
+            roomLog.push(doorBetweenRooms.getDestinationRoom());
+
+    }
+
+    public void enter() {}
 
     //this function to check for the valid more
 
@@ -177,17 +187,25 @@ class Wall extends MapSite{
 class Door extends MapSite{
     private int doorNumber;
     private static int doorCount = 1;
-    private Room room1;
-    private Room room2;
+    private Room roomStart;
+    private Room roomDestination;
 
     //constructor for door
     public Door(Room r1, Room r2, String doorName){
         super(doorName,"");
         doorNumber = doorCount++;
         //System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
-        this.room1 = r1;
-        this.room2 = r2;
+        this.roomStart = r1;
+        this.roomDestination = r2;
     }
+
+    public Room getDestinationRoom(){
+        return roomDestination;
+    }
+    public Room getStartRoom(){
+        return roomStart;
+    }
+
 
     //method toString() inside Door
     public String toString(){
@@ -196,7 +214,7 @@ class Door extends MapSite{
 
 
     void enter(){
-        System.out.println("Enter through " + doorNumber + " from " + room1 + " to " + room2);
+        //System.out.println("Enter through " + doorNumber + " from " + room1 + " to " + room2);
     }
 
 }
@@ -209,7 +227,7 @@ class Maze {
     private List<Room> roomList = new ArrayList<Room>();
 
     public Maze(){
-        System.out.println("creating a Maze ");
+        //System.out.println("creating a Maze ");
     }
 
     void addRoom(Room r){
@@ -227,8 +245,9 @@ class Maze {
         }
 
         //in case it cannot find any room that matches the parameter
-        return roomList.get(3);
+        return roomList.get(0);
     }
+
 
     public void showRoomList() {
         for(Room roomInMaze : roomList){
@@ -634,17 +653,41 @@ class ZorkUnderground extends MazeGame{
         Room newTreasureRoom = makeRoom("TreasureRoom");
 
         Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom, "door");
+        Door newLavaRoomAndCellarDoor = makeDoor(newLavaRoom, newCellar, "door");
+
         Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom,"door");
+        Door newEgyptRoomAndLavaRoomDoor = makeDoor(newEgyptRoom, newLavaRoom, "door");
+
         Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom,"door");
+        Door newRegenerationRoomAndEgyptRoomDoor = makeDoor(newRegenerationRoom, newEgyptRoom, "door");
+
         Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine, "door");
+        Door newCoalMineAndRegenerationRoomDoor = makeDoor(newCoalMine, newRegenerationRoom, "door");
+
         Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine,"door");
+        Door newCoalMineAndEgyptRoomDoor = makeDoor(newCoalMine, newEgyptRoom, "door");
+
         Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave,"door");
+        Door newGlacierCaveAndRegenerationDoor = makeDoor(newGlacierCave, newRegenerationRoom, "door");
+
         Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop,"door");
+        Door newBlacksmithWorkShopAndCoalMineDoor = makeDoor(newBlacksmithWorkshop, newCoalMine, "door");
+
         Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop,"door");
+        Door newBlacksmithWorkshopAndGlacierCaveDoor = makeDoor(newBlacksmithWorkshop, newGlacierCave, "door");
+
         Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom,"door");
+        Door newTrollRoomAndGlacierCaveDoor = makeDoor(newTrollRoom, newGlacierCave, "door");
+
         Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom,"door");
+        Door newRiddleRoomAndTrollRoomDoor = makeDoor(newRiddleRoom, newTrollRoom, "door");
+
         Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair,"door");
+        Door newDragonLairAndRiddleRoomDoor = makeDoor(newDragonLair, newTrollRoom, "door");
+
         Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom,"door");
+        Door newTreasureRoomAndDragonLairDoor = makeDoor(newTreasureRoom, newDragonLair, "door");
+
 
         ZorkMazeUnderground.addRoom(newCellar);
         ZorkMazeUnderground.addRoom(newLavaRoom);
@@ -658,12 +701,12 @@ class ZorkUnderground extends MazeGame{
         //setting sides for lava room
         newLavaRoom.setSide(Direction.North, newLavaRoomAndEgyptRoomDoor);
         newLavaRoom.setSide(Direction.South, makeWall());
-        newLavaRoom.setSide(Direction.East, newCellarAndLavaRoomDoor);
+        newLavaRoom.setSide(Direction.East, newLavaRoomAndCellarDoor);
         newLavaRoom.setSide(Direction.West, makeWall());
 
         //setting sides for egypt room
         newEgyptRoom.setSide(Direction.North, newEgyptRoomAndRegenerationRoomDoor);
-        newEgyptRoom.setSide(Direction.South, newLavaRoomAndEgyptRoomDoor);
+        newEgyptRoom.setSide(Direction.South, newEgyptRoomAndLavaRoomDoor);
         newEgyptRoom.setSide(Direction.East, newEgyptRoomAndCoalMineDoor);
         newEgyptRoom.setSide(Direction.West, makeWall());
 
@@ -671,40 +714,40 @@ class ZorkUnderground extends MazeGame{
         newRegenerationRoom.setSide(Direction.North, makeWall());
         newRegenerationRoom.setSide(Direction.South, newRegenerationRoomAndCoalMineDoor);
         newRegenerationRoom.setSide(Direction.East, newRegenerationRoomAndGlacierCaveDoor);
-        newRegenerationRoom.setSide(Direction.West, newEgyptRoomAndRegenerationRoomDoor);
+        newRegenerationRoom.setSide(Direction.West, newRegenerationRoomAndEgyptRoomDoor);
 
         //setting sides for coal mine
-        newCoalMine.setSide(Direction.North, newRegenerationRoomAndCoalMineDoor);
+        newCoalMine.setSide(Direction.North, newCoalMineAndRegenerationRoomDoor);
         newCoalMine.setSide(Direction.South, makeWall());
         newCoalMine.setSide(Direction.East, newCoalMineAndBlacksmithWorkshopDoor);
-        newCoalMine.setSide(Direction.West, newEgyptRoomAndCoalMineDoor);
+        newCoalMine.setSide(Direction.West, newCoalMineAndEgyptRoomDoor);
 
         //setting sides for glacier cave
         newGlacierCave.setSide(Direction.North, makeWall());
         newGlacierCave.setSide(Direction.South, newGlacierCaveAndBlacksmithWorkshopDoor);
         newGlacierCave.setSide(Direction.East, newGlacierCaveAndTrollRoomDoor);
-        newGlacierCave.setSide(Direction.West, newRegenerationRoomAndGlacierCaveDoor);
+        newGlacierCave.setSide(Direction.West, newGlacierCaveAndRegenerationDoor);
 
         //setting sides for blacksmithWorkshop
-        newBlacksmithWorkshop.setSide(Direction.North, newGlacierCaveAndBlacksmithWorkshopDoor);
+        newBlacksmithWorkshop.setSide(Direction.North, newBlacksmithWorkshopAndGlacierCaveDoor);
         newBlacksmithWorkshop.setSide(Direction.South, makeWall());
-        newBlacksmithWorkshop.setSide(Direction.East, newGlacierCaveAndTrollRoomDoor);
-        newBlacksmithWorkshop.setSide(Direction.West, newCoalMineAndBlacksmithWorkshopDoor);
+        newBlacksmithWorkshop.setSide(Direction.East, makeWall());
+        newBlacksmithWorkshop.setSide(Direction.West, newBlacksmithWorkShopAndCoalMineDoor);
 
         //setting sides for troll room
         newTrollRoom.setSide(Direction.North, makeWall());
         newTrollRoom.setSide(Direction.South, newTrollRoomAndRiddleRoomDoor);
         newTrollRoom.setSide(Direction.East, makeWall());
-        newTrollRoom.setSide(Direction.West, newGlacierCaveAndTrollRoomDoor);
+        newTrollRoom.setSide(Direction.West, newTrollRoomAndGlacierCaveDoor);
 
         //setting sides for riddle room
-        newRiddleRoom.setSide(Direction.North, newTrollRoomAndRiddleRoomDoor);
+        newRiddleRoom.setSide(Direction.North, newRiddleRoomAndTrollRoomDoor);
         newRiddleRoom.setSide(Direction.South, newRiddleRoomAndDragonLairDoor);
         newRiddleRoom.setSide(Direction.East, makeWall());
         newRiddleRoom.setSide(Direction.West, makeWall());
 
         //setting sides for dragon lair
-        newDragonLair.setSide(Direction.North, newRiddleRoomAndDragonLairDoor);
+        newDragonLair.setSide(Direction.North, newDragonLairAndRiddleRoomDoor);
         newDragonLair.setSide(Direction.South, makeWall());
         newDragonLair.setSide(Direction.East, makeWall());
         newDragonLair.setSide(Direction.West, newDragonLairAndTreasureRoomDoor);
@@ -712,7 +755,7 @@ class ZorkUnderground extends MazeGame{
         //setting sides for treasure room
         newTreasureRoom.setSide(Direction.North, makeWall());
         newTreasureRoom.setSide(Direction.South, makeWall());
-        newTreasureRoom.setSide(Direction.East, newDragonLairAndTreasureRoomDoor);
+        newTreasureRoom.setSide(Direction.East, newTreasureRoomAndDragonLairDoor);
         newTreasureRoom.setSide(Direction.West, makeWall());
 
 
@@ -760,12 +803,15 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
 
         //gotta add a connection to the kitchen and the attic
         Door newLivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen,"door");
+        Door newKitchenAndLivingRoomDoor = makeDoor(newKitchen, newLivingRoom, "door");
 
         //"door" to the attic
         Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic,"door");
+        Door newAtticAndKitchenDoor = makeDoor(newAttic, newKitchen, "door");
 
         //connect grassyfields to the living room
         Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom,"door");
+        Door newLivingRoomAndGrassyFieldDoor = makeDoor(newLivingRoom, newGrassyFields, "door");
 
         ZorkMaze.addRoom(newLivingRoom);
         ZorkMaze.addRoom(newKitchen);
@@ -779,14 +825,14 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         //walls for the living room
         newLivingRoom.setSide(Direction.North, makeWall());
         newLivingRoom.setSide(Direction.South,makeWall());
-        newLivingRoom.setSide(Direction.East, makeWall());
-        newLivingRoom.setSide(Direction.West, newLivingRoomAndKitchenDoor);
+        newLivingRoom.setSide(Direction.East, newLivingRoomAndKitchenDoor);
+        newLivingRoom.setSide(Direction.West, newLivingRoomAndGrassyFieldDoor);
 
         //walls for the kitchen
         newKitchen.setSide(Direction.North, makeWall());
         newKitchen.setSide(Direction.South, makeWall());
-        newKitchen.setSide(Direction.West, makeWall());
-        newKitchen.setSide(Direction.East, newLivingRoomAndKitchenDoor);
+        newKitchen.setSide(Direction.West, newKitchenAndLivingRoomDoor);
+        newKitchen.setSide(Direction.East, makeWall());
 
         //walls for the attic
         newAttic.setSide(Direction.North, makeWall());
@@ -811,7 +857,7 @@ public class Zork {
         MazeGame game = new ZorkMazeGame();
         Maze maze = game.createMaze();
         maze.showRoomList();
-        System.out.println("Hello");
+        //System.out.println("Hello");
         System.out.println();
 
         Player newPlayer = new Player(maze.getRoom("Grassy Fields"));
@@ -834,9 +880,9 @@ public class Zork {
             if(list.isEmpty()) {
                 System.out.println("Please input a command.\n");
             }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
+            else if(checkLegitCommand(list)){ //this function is for checking if the command is correct
                 if(isValidMove(newPlayer, list)) { //this is to check if they input any of the keywords
-                    System.out.println("correct");
+
                 }
                 else if(!isValidMove(newPlayer, list)){
                     System.out.println("Please input a valid command.");
@@ -849,14 +895,14 @@ public class Zork {
         /*        StartGame();*/
     }
 
-    public static void StartGame() {
-        /*StartingPoints startingPoint = new StartingPoints();
-        startingPoint.grassyFieldsStart();*/
-    }
+//    public static void StartGame() {
+//        /*StartingPoints startingPoint = new StartingPoints();
+//        startingPoint.grassyFieldsStart();*/
+//    }
 
-    public void checkUserInput() {
-
-    }
+//    public void checkUserInput() {
+//
+//    }
 
     public static boolean checkLegitCommand(List<String> words) {
         String[] directions = {
@@ -934,7 +980,7 @@ public class Zork {
         return legitCommand;
     }
 
-    //
+    //this function is for checking Valid Move --> valid move happened when there is a door at a certain direction
     public static boolean isValidMove(Player player, List<String> words) {
         boolean x = false;
         if(words.contains("OPEN") && words.contains("DOOR")) {
@@ -963,5 +1009,7 @@ public class Zork {
         }
         return x;
     }
+
+
 
 }
