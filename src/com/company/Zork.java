@@ -806,17 +806,17 @@ public class Zork {
             System.out.print(">");
             input = scan.nextLine().toUpperCase();
             words = input.split(" "); //split by the spaces read in
-            List<String> list = Arrays.asList(words);
+            List<String> list = Arrays.asList(words); //this holds the commands
 
             if(list.isEmpty()) {
                 System.out.println("Please input a command.\n");
             }
             else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                if(putWordsTogether(list)) { //this is to check if they input any of the keywords
+                if(isValidMove(list)) { //this is to check if they input any of the keywords
 
                 }
-                else if(!putWordsTogether(list)){
-                    System.out.println("Pleas input a valid command.");
+                else if(!isValidMove(list)){
+                    System.out.println("Please input a valid command.");
                     continue;
                 }
             }
@@ -911,17 +911,26 @@ public class Zork {
         return legitCommand;
     }
 
-    public static boolean putWordsTogether(List<String> words) {
+    //
+    public static boolean isValidMove(Player player, Room room, List<String> words) {
         boolean x;
 
         if(words.contains("OPEN") && words.contains("DOOR")) {
             //create another starting point in the living room class
             x = true;
         }
-        else {
-            //idk what to put here yet
-            x = false;
+        else if(words.contains("GO")) {
+            if(words.contains("EAST") && player.getPosition().getSide(Direction.East)) {
+                x = false;
+            }
+
         }
+
+
         return x;
     }
+
+//    public static boolean isValidMove(List<String> words) {
+//
+//    }
 }
