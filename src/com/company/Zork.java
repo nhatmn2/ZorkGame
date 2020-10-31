@@ -812,10 +812,10 @@ public class Zork {
                 System.out.println("Please input a command.\n");
             }
             else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                if(isValidMove(list)) { //this is to check if they input any of the keywords
+                if(isValidMove(newPlayer, list)) { //this is to check if they input any of the keywords
 
                 }
-                else if(!isValidMove(list)){
+                else if(!isValidMove(newPlayer, list)){
                     System.out.println("Please input a valid command.");
                     continue;
                 }
@@ -912,7 +912,7 @@ public class Zork {
     }
 
     //
-    public static boolean isValidMove(Player player, Room room, List<String> words) {
+    public static boolean isValidMove(Player player, List<String> words) {
         boolean x;
 
         if(words.contains("OPEN") && words.contains("DOOR")) {
@@ -921,7 +921,12 @@ public class Zork {
         }
         else if(words.contains("GO")) {
             if(words.contains("EAST") && player.getPosition().getSide(Direction.East)) {
+                //return false if the direction has a wall
                 x = false;
+            }
+            else {
+                //return true if that direction has a door
+                x = true;
             }
 
         }
