@@ -53,6 +53,7 @@ class Player extends MapSite {
         this.health = 100;
         this.sack = new String[10];
         this.roomPosition = startRoom;
+        System.out.println(roomPosition);
     }
 
     //this function is used to get the player position (i.e in what room)
@@ -86,6 +87,7 @@ class Room extends MapSite {
     public Room() {
         roomNumber = roomCount++;
         System.out.println("creating room number " + roomNumber);
+
     }
 
     //method setSide() inside Room
@@ -122,10 +124,11 @@ class Room extends MapSite {
         }
         return result;
     }
+
     //method toString() inside Room
-    public String toString(){
-        return "Room number" + Integer.toString(roomNumber);
-    }
+//    public String toString(){
+//        return "Room number" + Integer.toString(roomNumber);
+//    }
 
     void enter(){
         System.out.println("enter to Room " + roomNumber);
@@ -204,13 +207,13 @@ class Maze {
 
     public Room getRoom(String room) {
         for(Room roomComp : roomList) {
-            if(roomComp.getName().equals(room)) {
+            if(roomComp.toString().equalsIgnoreCase(room)) {
                 return roomComp;
             }
         }
 
         //in case it cannot find any room that matches the parameter
-        return roomList.get(1);
+        return roomList.get(3);
     }
 
     public void showRoomList() {
