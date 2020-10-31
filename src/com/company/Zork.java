@@ -21,14 +21,18 @@ final class Direction {
         return directionName;
     }
 }
-//============================================================================================================
-//create an abstract super class MapSite
-//============================================================================================================
 
+//==================================================================
+// Mapsite
+//==================================================================
 abstract class MapSite{
     private String name;
     private String description;
 
+    public MapSite(String newName, String newDescription) {
+        this.name = newName;
+        this.description = newDescription;
+    }
     public String getName() {return  name;}
     public void setName(String newName){ this.name = newName;}
 
@@ -38,9 +42,9 @@ abstract class MapSite{
     abstract void enter();
 }
 
-//============================================================================
+//==================================================================
 // Player Class
-//============================================================================
+//==================================================================
 class Player extends MapSite {
     private int health;
     private String[] sack;
@@ -50,9 +54,11 @@ class Player extends MapSite {
 
     //constructor for creating the player
     public Player(Room startRoom){
+        super("player 1", "this is player 1");
         this.health = 100;
         this.sack = new String[10];
         this.roomPosition = startRoom;
+        System.out.println(roomPosition);
     }
 
     //this function is used to get the player position (i.e in what room)
@@ -66,6 +72,9 @@ class Player extends MapSite {
     }
 
     public void enter() { }
+
+    //this function to check for the valid more
+
 }
 
 //============================================================================================================
@@ -73,52 +82,6 @@ class Player extends MapSite {
 //============================================================================================================
 
 class Room extends MapSite {
-    //this is for the word parsing for each room
-    //keywords for directions
-    String[] directions = {
-            "NORTH", "SOUTH", "EAST", "WEST", "FORWARD", "BACKWARDS",
-            "LEFT", "RIGHT", "UPSTAIRS", "DOWNSTAIRS", "CELLAR", "WINDOW", //the window is basically go forward or go north
-            "DOOR", "KITCHEN"
-    };
-
-    //keywords for actions
-    String[] actions = {
-            "ATTACK", "SEARCH", "UNLOCK", "JUMP", "TAKE", "LOOK", "GO", "OPEN",
-            "INVENTORY", "OPEN", "SAVE"
-    };
-
-    //Might need an array of items
-    String[] items = {
-            "LEAFLET", "MAILBOX", "WINDOW", "TROPHY", "SWORD"
-    };
-
-    private String direction;
-    private String action;
-    private String item;
-
-
-    private boolean bDirection; //the 'b' just means boolean
-    private boolean bAction;
-    boolean bItem;
-
-    //accessors
-    public String getDirection() { return direction; }
-    public String getAction() { return action; }
-    public String getItem() { return item; }
-
-    public boolean getBDirection() { return bDirection; }
-    public boolean getBAction() { return bAction; }
-    public boolean getBItem() { return bItem; }
-
-    //mutators
-    public void setBDirection(boolean bDirection) { this.bDirection = bDirection; }
-    public void setBAction(boolean bAction) { this.bAction = bAction; }
-    public void setBItem(boolean bItem) { this.bItem = bItem; }
-
-    public void setDirection(String direction) { this.direction = direction; }
-    public void setAction(String action) { this.action = action; }
-    public void setItem(String item) { this.item = item; }
-
     //this is for the room itself
     private int roomNumber;
     //this field is for the const starting room
@@ -129,10 +92,13 @@ class Room extends MapSite {
     private MapSite westSide;
 
     //constructor for room
-    public Room() {
+    public Room(String roomName, String roomDescription) {
+        super(roomName, roomDescription);
         roomNumber = roomCount++;
-        System.out.println("creating room number " + roomNumber);
+        //System.out.println("creating room number " + roomNumber);
+
     }
+
 
     //method setSide() inside Room
     public void setSide(Direction d, MapSite site){
@@ -148,7 +114,7 @@ class Room extends MapSite {
         else if (d == Direction.West){
             westSide = site;
         }
-        System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
+        //System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
     }
 
     //method getSide() inside Room
@@ -169,13 +135,15 @@ class Room extends MapSite {
         return result;
     }
     //method toString() inside Room
-    public String toString(){
-        return "Room number" + Integer.toString(roomNumber);
-    }
+//    public String toString(){
+//        return "Room number" + Integer.toString(roomNumber);
+//    }
 
     void enter(){
         System.out.println("enter to Room " + roomNumber);
     }
+
+
 
 }
 //=======================================================================================================
@@ -188,6 +156,7 @@ class Wall extends MapSite{
 
     //constructor for wall
     public Wall(){
+        super("","");
         wallNumber = wallCount++;
         System.out.println("creating Wall number" +  Integer.toString(wallNumber));
     }
@@ -212,9 +181,10 @@ class Door extends MapSite{
     private Room room2;
 
     //constructor for door
-    public Door(Room r1, Room r2){
+    public Door(Room r1, Room r2, String doorName){
+        super(doorName,"");
         doorNumber = doorCount++;
-        System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
+        //System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
         this.room1 = r1;
         this.room2 = r2;
     }
@@ -223,6 +193,7 @@ class Door extends MapSite{
     public String toString(){
         return "Door number " + Integer.toString(doorNumber);
     }
+
 
     void enter(){
         System.out.println("Enter through " + doorNumber + " from " + room1 + " to " + room2);
@@ -233,7 +204,7 @@ class Door extends MapSite{
 //create class Maze
 //=============================================================================================================
 
-class Maze{
+class Maze {
     //this class has and Arraylist to keep track of the number of maze
     private List<Room> roomList = new ArrayList<Room>();
 
@@ -246,6 +217,17 @@ class Maze{
         if(!roomList.contains(r)){
             roomList.add(r);
         }
+    }
+
+    public Room getRoom(String room) {
+        for(Room roomComp : roomList) {
+            if(roomComp.toString().equalsIgnoreCase(room)) {
+                return roomComp;
+            }
+        }
+
+        //in case it cannot find any room that matches the parameter
+        return roomList.get(3);
     }
 
     public void showRoomList() {
@@ -283,18 +265,18 @@ class ItemList {
 //create livingRoom
 //======================================================================================================
 
-class LivingRoom extends Room implements WordParser {
+class LivingRoom extends Room {
     //create livingRoom with tools
     private MazeGame underground;
-    private final String description = "You are entering the living room. In here you can find all the tool you need for your journey\n";
+    //private final String description = "You are entering the living room. In here you can find all the tool you need for your journey\n";
     //when the livingRoom is created the livingRoomItemList is also created
-    LivingRoom(MazeGame newMaze) {
-        super();
+    LivingRoom() {
+        super("living room", "you are entering the living room");
         //I created another underground Maze after you enter the cellar.
-        this.underground = newMaze;
+        //this.underground = newMaze;
         //System.out.println(description);
         //this is for creating item list inside living room!
-        getDescription();
+        //getDescription();
         ItemList livingRoomItemList = new ItemList();
         livingRoomItemList.addItems("Trophy case");
         livingRoomItemList.addItems("Lamp");
@@ -302,114 +284,12 @@ class LivingRoom extends Room implements WordParser {
         livingRoomItemList.addItems("Old Sword");
         livingRoomItemList.showItemList();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
+
     public String toString() {
         return "living room";
-    }
-
-    public void startingPoint() {
-        Scanner scan = new Scanner(System.in);
-        boolean running = true;
-        String input = "";
-        String words[];
-
-        System.out.println("You see a hatch on the ground and another door leading to the kitchen.");
-        while(running) {
-            System.out.println("Where do you want to go?");
-            System.out.print(">");
-            input = scan.nextLine().toUpperCase();
-
-            words = input.split(" "); //split by the spaces read in
-            List<String> list = Arrays.asList(words);
-
-            if(input.isEmpty()) {
-                System.out.println("Please input a command.\n");
-            }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                putWordsTogether(list);
-                //here will update the players location
-                //since there are items here, update the sack if the player picks up any
-                running = false;
-            }
-
-        }
-    }
-
-    public void getCommand(List<String> words) {
-        //check if the incoming list of strings is empty
-        if(words.isEmpty())
-        {
-            System.out.println("Please input a command.");
-        }
-        checkLegitCommand(words);
-    }
-
-    //void
-    public boolean checkLegitCommand(List<String> words) {
-        List<String> keywords = new ArrayList<String>();
-        boolean legitCommand = false;
-
-        //check for actions(verbs)
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                System.out.println("Found action! " + actions[i]);
-                setBAction(true);
-
-                setAction(actions[i]);
-
-                keywords.add(getAction());
-            }
-        }
-
-        //check for directions
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                System.out.println("Found direction! " + directions[i]);
-                setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
-
-                setDirection(directions[i]);
-
-                keywords.add(getDirection());
-            }
-        }
-
-        //check for items
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                System.out.println("Found item! " + items[i]);
-                setBItem(true);
-                setItem(items[i]);
-
-                keywords.add(getItem());
-            }
-        }
-
-        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
-            legitCommand = true;
-        }
-        else {
-            legitCommand = false;
-        }
-
-        //pass the keywords to the final class to determine the final action
-        //putWordsTogether(keywords);
-
-        return legitCommand;
-    }
-
-    public void putWordsTogether(List<String> words) {
-        //here will be actions leading to either the cellar or the kitchen
-        if(words.contains("GO") && words.contains("KITCHEN")) {
-            //player will end up in the kitchen
-            Kitchen kitchen = new Kitchen();
-        }
-        else {
-
-        }
     }
 }
 
@@ -432,11 +312,11 @@ class LivingRoom extends Room implements WordParser {
 class Kitchen extends Room {
     //create kitchen with tools
     //can add description of the kitchen later
-    private final String description = "You are entering the kitchen.";
+    //private final String description = "You are entering the kitchen.";
     Kitchen() {
-        super();
+        super("kitchen", "You are entering the kitchen");
         //System.out.println(description);
-        getDescription();
+        //getDescription();
         ItemList kitchenItemList = new ItemList();
         kitchenItemList.addItems("Sack");
         kitchenItemList.addItems("Garlic");
@@ -444,14 +324,16 @@ class Kitchen extends Room {
         kitchenItemList.showItemList();
     }
 
-    public String getDescription() {
-        return description;
-    }
+//    public String getDescription() {
+//        return description;
+//    }
 
     public String toString() {
         return "kitchen";
     }
+
 }
+
 //=======================================================================================================
 //create Attic
 //=======================================================================================================
@@ -459,20 +341,20 @@ class Kitchen extends Room {
 class Attic extends Room {
     //don't forget to create items for the attic
 
-    private final String description = "You are entering the attic.";
+    //private final String description = "You are entering the attic.";
     Attic() {
-        super();
+        super("attic", "You are entering the attic");
         //System.out.println(description);
-        getDescription();
+        //getDescription();
         ItemList atticItemList = new ItemList();
         atticItemList.addItems("Rope");
         atticItemList.addItems("Brick");
         atticItemList.addItems("Axe");
         atticItemList.showItemList(); //just to test whether the items are showing up
     }
-    public String getDescription() {
-        return description;
-    }
+//    public String getDescription() {
+//        return description;
+//    }
 
     public String toString() { return "attic"; }
 }
@@ -480,150 +362,32 @@ class Attic extends Room {
 //=====================================================================================================
 //Creating Starting Point/Grassy Fields
 //==========================================================================
-class GrassyFields extends Room implements WordParser{
+class GrassyFields extends Room{
     //we're gonna have to implement a getCommand and a putWordsTogether function in each room
 
-    List<String> list = new ArrayList<String>();
-
-    private final String description = "You are in a grassy field.";
+    //private final String description = "You are in a grassy field.";
     GrassyFields() {
-        super();
-        System.out.println(description);
+        super("grassy fields", "You are in a grassy field");
+        //System.out.println(description);
+        //setName("Grassy Fields");
     }
+    //public String getDescription() { return description; }
 
     public String toString() { return "grassy field"; }
-
-    //the true starting point
-    public void startingPoint() {
-        Scanner scan = new Scanner(System.in);
-
-        String input = "";
-        String words[];
-        boolean running = true;
-
-        //loop to keep asking what the player wants to do
-        //changed the code for checkLegitCommand to return a boolean if it found a combination of words
-        //if it returns a true, then it will pass it into the putWordsTogether method to determine the action
-        System.out.println("You wake up in front of a house.");
-        while(running) {
-            System.out.println("Where do you want to go?");
-            System.out.print(">");
-            input = scan.nextLine().toUpperCase();
-
-            words = input.split(" "); //split by the spaces read in
-            List<String> list = Arrays.asList(words);
-
-            if(input.isEmpty()) {
-                System.out.println("Please input a command.\n");
-            }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
-                putWordsTogether(list);
-                //also update the players location
-                running = false;
-            }
-
-        }
-
-        /*words = input.split(" "); //split by the spaces read in
-        List<String> list = Arrays.asList(words);*/
-
-        //getCommand(list);
-    }
-
-    //checks if the list is null, then passes the list to another function
-    /*public void getCommand(List<String> words) {
-        //check if the incoming list of strings is empty
-        if(words.isEmpty())
-        {
-            System.out.println("Please input a command.");
-        }
-        checkLegitCommand(words);
-    }*/
-
-    //void
-    public boolean checkLegitCommand(List<String> words) {
-        List<String> keywords = new ArrayList<String>();
-        boolean legitCommand = false;
-
-        //check for actions(verbs)
-        for(int i = 0; i < actions.length; ++i) {
-            if(words.contains(actions[i])) {
-                System.out.println("Found action! " + actions[i]);
-                setBAction(true);
-
-                setAction(actions[i]);
-
-                keywords.add(getAction());
-            }
-        }
-
-        //check for directions
-        for(int i = 0; i < directions.length; ++i) {
-            //this shit works
-            if(words.contains(directions[i])) {
-                System.out.println("Found direction! " + directions[i]);
-                setBDirection(true); //you have to access the actual variable
-                //this.bDirection = true;
-
-                setDirection(directions[i]);
-
-                keywords.add(getDirection());
-            }
-        }
-
-        //check for items
-        for(int i = 0; i < items.length; ++i) {
-            if(words.contains(items[i])) {
-                System.out.println("Found item! " + items[i]);
-                setBItem(true);
-                setItem(items[i]);
-
-                keywords.add(getItem());
-            }
-        }
-
-        if((getBAction() && getBDirection()) || (getBAction() && getBItem())) {
-            legitCommand = true;
-        }
-        else {
-            legitCommand = false;
-        }
-
-        //pass the keywords to the final class to determine the final action
-        //putWordsTogether(keywords);
-
-        return legitCommand;
-    }
-
-    public void putWordsTogether(List<String> words) {
-        //if the command is "open door" then the player will end up in the living room
-        //still trying to figure out how that is going to work
-        //player class can be updated in this function to keep track of proces
-        if(words.contains("OPEN") && words.contains("DOOR")) {
-            ZorkUnderground zorkUnderground = new ZorkUnderground();
-            LivingRoom livingRoom = new LivingRoom(zorkUnderground);
-            //create another starting point in the living room class
-            livingRoom.startingPoint();
-        }
-        else {
-
-        }
-    }
-
 }
 
 //=======================================================================================================
 //create Cellar
 //=======================================================================================================
 class Cellar extends Room {
-    private final String description = "You are entering the cellar.";
+    //private final String description = "You are entering the cellar.";
     Cellar() {
-        super();
-        getDescription();
+        super("cellar", "You are entering the cellar");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
 
     public String toString(){
         return "cellar";
@@ -635,14 +399,14 @@ class Cellar extends Room {
 //create Lava Room
 //======================================================================================================
 class LavaRoom extends Room{
-    private final String description  = "You are entering the lava room. ";
+    //private final String description  = "You are entering the lava room. ";
     LavaRoom(){
-        super();
-        getDescription();
+        super("lava room", "you are entering lava room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
 
     public String toString(){
         return "lava room.";
@@ -655,12 +419,12 @@ class LavaRoom extends Room{
 class RegenerationRoom extends Room{
     private final String description = "You are entering the regenerating room.";
     RegenerationRoom(){
-        super();
-        getDescription();
+        super("regeneration room", "You are entering the regenerating room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "regenerating room.";
     }
@@ -670,14 +434,14 @@ class RegenerationRoom extends Room{
 //create Glacier Cave
 //======================================================================================================
 class GlacierCave extends Room{
-    private final String description = "You are entering the glacier cave.";
+    //private final String description = "You are entering the glacier cave.";
     GlacierCave(){
-        super();
-        getDescription();
+        super("glacier cave", "You are entering the glacier cave");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "glacier cave.";
     }
@@ -689,12 +453,12 @@ class GlacierCave extends Room{
 class EgyptRoom extends Room{
     private final String description = "You are entering the egypt room.";
     EgyptRoom(){
-        super();
-        getDescription();
+        super("egypt room","You are entering the egypt room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "Egypt room. ";
     }
@@ -703,14 +467,14 @@ class EgyptRoom extends Room{
 //create Coal Mine
 //======================================================================================================
 class CoalMine extends Room{
-    private final String description = "You are entering the coal mine.";
+    //private final String description = "You are entering the coal mine.";
     CoalMine(){
-        super();
+        super("coal mine", "You are entering the coal mine");
         getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "coal mine. ";
     }
@@ -719,14 +483,14 @@ class CoalMine extends Room{
 //create Blacksmith Workshop
 //======================================================================================================
 class BlacksmithWorkshop extends Room{
-    private final String description = "You are entering the Blacksmith Workshop.";
+    //private final String description = "You are entering the Blacksmith Workshop.";
     BlacksmithWorkshop(){
-        super();
+        super("blacksmith workshop", "You are entering the Blacksmith Workshop");
         getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "blacksmith workshop. ";
     }
@@ -736,14 +500,14 @@ class BlacksmithWorkshop extends Room{
 //create Troll Room
 //======================================================================================================
 class TrollRoom extends Room{
-    private final String description = "You are entering the Troll Room.";
+    //private final String description = "You are entering the Troll Room.";
     TrollRoom(){
-        super();
-        getDescription();
+        super("troll room", "You are entering the Troll Room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "troll room. ";
     }
@@ -755,12 +519,12 @@ class TrollRoom extends Room{
 class RiddleRoom extends Room{
     private final String description = "You are entering the Riddle Room.";
     RiddleRoom(){
-        super();
-        getDescription();
+        super("riddle room", "You are entering the Riddle Room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "riddle room. ";
     }
@@ -770,14 +534,14 @@ class RiddleRoom extends Room{
 //create Dragon's Lair
 //======================================================================================================
 class DragonLair extends Room{
-    private final String description = "You are entering the Dragon's Lair.";
+    //private final String description = "You are entering the Dragon's Lair.";
     DragonLair(){
-        super();
-        getDescription();
+        super("dragon lair", "You are entering the dragon's lair");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "dragon's lair. ";
     }
@@ -786,14 +550,14 @@ class DragonLair extends Room{
 //create Treasure Room
 //======================================================================================================
 class TreasureRoom extends Room{
-    private final String description = "You are entering the Treasure Room.";
+    //private final String description = "You are entering the Treasure Room.";
     TreasureRoom(){
-        super();
-        getDescription();
+        super("treasure room", "You are entering the treasure room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "treasure room. ";
     }
@@ -804,21 +568,25 @@ class TreasureRoom extends Room{
 class MazeGame { //this is where the factory for the zork game happens
     public Maze makeMaze(){return new Maze();}
 
-    public Room makeRoom(){return new Room();}
+    public Room makeRoom(String newName){
+        return new Room(newName,"");
+    }
+
 
     public Wall makeWall(){return new Wall();}
 
-    public Door makeDoor(Room r1, Room r2){ return new Door(r1,r2);}
+    public Door makeDoor(Room r1, Room r2, String newDoorName){ return new Door(r1,r2, newDoorName);}
 
     public Maze createMaze(){
         Maze aMaze = makeMaze();
-        Room r1 = makeRoom();
-        Room r2 = makeRoom();
-        Door theDoor = makeDoor(r1, r2);
+        Room r1 = makeRoom("room1");
+        Room r2 = makeRoom("room2");
+        Door theDoor = makeDoor(r1, r2, "the door");
         aMaze.addRoom(r1);
         aMaze.addRoom(r2);
         return aMaze;
     }
+
 }
 //=========================================================================================================
 //create an underground map
@@ -848,7 +616,7 @@ class ZorkUnderground extends MazeGame{
         else if (kindOfRoomUnderground.equals("TreasureRoom"))
             return new TreasureRoom();
         else
-            return new Room();
+            return new Room("","");
     }
     public Maze createMaze(){
         Maze ZorkMazeUnderground = makeMaze();
@@ -865,18 +633,18 @@ class ZorkUnderground extends MazeGame{
         Room newDragonLair = makeRoom("DragonLair");
         Room newTreasureRoom = makeRoom("TreasureRoom");
 
-        Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom);
-        Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom);
-        Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom);
-        Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine);
-        Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine);
-        Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave);
-        Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop);
-        Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop);
-        Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom);
-        Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom);
-        Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair);
-        Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom);
+        Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom, "door");
+        Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom,"door");
+        Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom,"door");
+        Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine, "door");
+        Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine,"door");
+        Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave,"door");
+        Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop,"door");
+        Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop,"door");
+        Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom,"door");
+        Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom,"door");
+        Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair,"door");
+        Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom,"door");
 
         ZorkMazeUnderground.addRoom(newCellar);
         ZorkMazeUnderground.addRoom(newLavaRoom);
@@ -950,17 +718,17 @@ class ZorkUnderground extends MazeGame{
 
         return ZorkMazeUnderground;
     }
+
 }
 
 //=============================================================================
 // Interface WordParser
 //=============================================================================
-abstract interface WordParser {
+/*abstract interface WordParser {
     //public void checkLegitCommand(List<String> words);
     public boolean checkLegitCommand(List<String> words);
-    abstract void putWordsTogether(List<String> words);
-}
-
+    abstract boolean putWordsTogether(List<String> words);
+}*/
 
 //=========================================================================================================
 //create a livingRoomAndKitchenMaze
@@ -968,9 +736,8 @@ abstract interface WordParser {
 class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the rooms together
     //overload and override the makeRoom
     public Room makeRoom(String kindOfRoom){
-        ZorkUnderground zorkUnderground = new ZorkUnderground();
         if(kindOfRoom.equals("LivingRoom"))
-            return new LivingRoom(zorkUnderground);
+            return new LivingRoom();
         else if(kindOfRoom.equals("Kitchen"))
             return new Kitchen();
             //we need to put more else if every time we create the new room...........
@@ -979,7 +746,7 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         else if(kindOfRoom.equals("GrassyFields"))
             return new GrassyFields();
         else
-            return new Room();
+            return new Room("","");
 
     }
     //override the create Maze
@@ -992,13 +759,13 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         Room newGrassyFields = makeRoom("GrassyFields");
 
         //gotta add a connection to the kitchen and the attic
-        Door newlivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen);
+        Door newLivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen,"door");
 
         //"door" to the attic
-        Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic);
+        Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic,"door");
 
         //connect grassyfields to the living room
-        Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom);
+        Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom,"door");
 
         ZorkMaze.addRoom(newLivingRoom);
         ZorkMaze.addRoom(newKitchen);
@@ -1013,13 +780,13 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         newLivingRoom.setSide(Direction.North, makeWall());
         newLivingRoom.setSide(Direction.South,makeWall());
         newLivingRoom.setSide(Direction.East, makeWall());
-        newLivingRoom.setSide(Direction.West, newlivingRoomAndKitchenDoor);
+        newLivingRoom.setSide(Direction.West, newLivingRoomAndKitchenDoor);
 
         //walls for the kitchen
         newKitchen.setSide(Direction.North, makeWall());
         newKitchen.setSide(Direction.South, makeWall());
         newKitchen.setSide(Direction.West, makeWall());
-        newKitchen.setSide(Direction.East, newlivingRoomAndKitchenDoor);
+        newKitchen.setSide(Direction.East, newLivingRoomAndKitchenDoor);
 
         //walls for the attic
         newAttic.setSide(Direction.North, makeWall());
@@ -1039,7 +806,7 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
     }
 }
 
-public class Zork{
+public class Zork {
     public static void main(String[] args){
         MazeGame game = new ZorkMazeGame();
         Maze maze = game.createMaze();
@@ -1047,14 +814,154 @@ public class Zork{
         System.out.println("Hello");
         System.out.println();
 
-        //most likely needs a loop here to check whether the game is finished or not
-        StartGame();
+        Player newPlayer = new Player(maze.getRoom("Grassy Fields"));
 
+//        System.out.println();
+//        System.out.println(newPlayer.getPosition().getSide(Direction.East).getName());
+
+        Scanner scan = new Scanner(System.in);
+        String input = "";
+        String words[];
+        boolean winningCondition = false;
+
+        while(!winningCondition) {
+            System.out.println("What do you want to do?");
+            System.out.print(">");
+            input = scan.nextLine().toUpperCase();
+            words = input.split(" "); //split by the spaces read in
+            List<String> list = Arrays.asList(words); //this holds the commands
+
+            if(list.isEmpty()) {
+                System.out.println("Please input a command.\n");
+            }
+            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
+                if(isValidMove(newPlayer, list)) { //this is to check if they input any of the keywords
+                    System.out.println("correct");
+                }
+                else if(!isValidMove(newPlayer, list)){
+                    System.out.println("Please input a valid command.");
+                    continue;
+                }
+            }
+        }
+
+        //most likely needs a loop here to check whether the game is finished or not
+        /*        StartGame();*/
     }
 
     public static void StartGame() {
-        GrassyFields grassyFields = new GrassyFields();
-        grassyFields.startingPoint();
+        /*StartingPoints startingPoint = new StartingPoints();
+        startingPoint.grassyFieldsStart();*/
+    }
+
+    public void checkUserInput() {
 
     }
+
+    public static boolean checkLegitCommand(List<String> words) {
+        String[] directions = {
+                "NORTH", "SOUTH", "EAST", "WEST", "FORWARD", "BACKWARDS",
+                "LEFT", "RIGHT", "UPSTAIRS", "DOWNSTAIRS", "CELLAR", "WINDOW", //the window is basically go forward or go north
+                "DOOR", "KITCHEN", "ROOM", "LIVINGROOM"
+        };
+
+        //keywords for actions
+        String[] actions = {
+                "ATTACK", "SEARCH", "UNLOCK", "JUMP", "TAKE", "LOOK", "GO", "OPEN",
+                "INVENTORY", "OPEN", "SAVE", "LOOK", "AROUND", "EXAMINE"
+        };
+
+        //Might need an array of items
+        String[] items = {
+                "LEAFLET", "MAILBOX", "WINDOW", "TROPHY", "SWORD"
+        };
+
+        List<String> keywords = new ArrayList<String>();
+        boolean legitCommand = false;
+        boolean bAction = false;
+        boolean bDirection = false;
+        boolean bItem = false;
+
+        String direction;
+        String action;
+        String item;
+
+        //check for actions(verbs)
+        for(int i = 0; i < actions.length; ++i) {
+            if(words.contains(actions[i])) {
+                System.out.println("Found action! " + actions[i]);
+                bAction = true;
+
+                //setAction(actions[i]);
+                action = actions[i];
+
+                keywords.add(action);
+            }
+        }
+
+        //check for directions
+        for(int i = 0; i < directions.length; ++i) {
+            //this shit works
+            if(words.contains(directions[i])) {
+                System.out.println("Found direction! " + directions[i]);
+                bDirection = true;
+
+                direction = directions[i];
+
+                keywords.add(direction);
+            }
+        }
+
+        //check for items
+        for(int i = 0; i < items.length; ++i) {
+            if(words.contains(items[i])) {
+                System.out.println("Found item! " + items[i]);
+                bItem = true;
+
+                item = items[i];
+
+                keywords.add(item);
+            }
+        }
+
+        if((bAction && bDirection) || (bAction && bItem)) {
+            legitCommand = true;
+        }
+        else {
+            legitCommand = false;
+        }
+
+        return legitCommand;
+    }
+
+    //
+    public static boolean isValidMove(Player player, List<String> words) {
+        boolean x = false;
+        if(words.contains("OPEN") && words.contains("DOOR")) {
+            //create another starting point in the living room class
+            x = true;
+        }
+        else if(words.contains("GO")) {
+            if(words.contains("EAST") && player.getPosition().getSide(Direction.East).getName().equals("door")) {
+                //return false if the direction has a wall
+                x = false;
+            }
+            else if(words.contains("WEST") && player.getPosition().getSide(Direction.West).getName().equals("door")){
+                x = false;
+            }
+            else if(words.contains("NORTH") && player.getPosition().getSide(Direction.North).getName().equals("door")){
+                x = false;
+            }
+            else if(words.contains("SOUTH") && player.getPosition().getSide(Direction.South).getName().equals("door")){
+                x = false;
+            }
+            else{
+                System.out.println("valid move you can go that way");
+                x = true;
+            }
+            return x;
+        }
+        return x;
+    }
+
 }
