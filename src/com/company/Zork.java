@@ -187,7 +187,7 @@ class Door extends MapSite{
 //create class Maze
 //=============================================================================================================
 
-class Maze{
+class Maze {
     //this class has and Arraylist to keep track of the number of maze
     private List<Room> roomList = new ArrayList<Room>();
 
@@ -200,6 +200,17 @@ class Maze{
         if(!roomList.contains(r)){
             roomList.add(r);
         }
+    }
+
+    public Room getRoom(String room) {
+        for(Room roomComp : roomList) {
+            if(roomComp.getName().equals(room)) {
+                return roomComp;
+            }
+        }
+
+        //in case it cannot find any room that matches the parameter
+        return roomList.get(1);
     }
 
     public void showRoomList() {
@@ -340,6 +351,7 @@ class GrassyFields extends Room{
     GrassyFields() {
         super();
         System.out.println(description);
+        setName("Grassy Fields");
     }
     public String getDescription() { return description; }
 
@@ -778,6 +790,8 @@ public class Zork {
         maze.showRoomList();
         System.out.println("Hello");
         System.out.println();
+
+        Player newPlayer = new Player(maze.getRoom("Grassy Fields"));
 
         Scanner scan = new Scanner(System.in);
         String input = "";
