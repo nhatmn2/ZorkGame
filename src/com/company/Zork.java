@@ -115,6 +115,8 @@ class Player extends MapSite {
     //get health
     public int getHealth() { return health; }
 
+    public void setHealth(int health) { this.health = health; }
+
     //this function is used to get the player position (i.e in what room)
     public Room getPosition() {
         return roomPosition;
@@ -1097,7 +1099,7 @@ public class Zork {
                     System.out.println("\tYou strike the " + monster.getName() + " for "
                                         + sword.getDamageValue() + " damage!");
                     System.out.println("\tYou take " + monster.getDamage() + " from the monster!");
-
+                    player.setHealth(player.getHealth() - monster.getDamage());
 
                     if(player.getHealth() < 1) {
                         System.out.println("\t>You've taken way too much damage, you die from you incompetence.");
