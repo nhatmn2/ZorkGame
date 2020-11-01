@@ -46,6 +46,7 @@ class Player extends MapSite {
     private int health;
     private String[] sack;
     private Room roomPosition;  //the room at which the player present
+
     private Stack<Room> roomLog = new Stack<>(); //this is to keep track of the room player has visited
 
     //private String name; //I leave it hear if you want to have the player's name
@@ -53,10 +54,11 @@ class Player extends MapSite {
 
     //constructor for creating the player
     public Player(Room startRoom){
-        super("player 1", "this is player 1");
+        super("player 1 ", "this is player 1");
         this.health = 100;
         this.sack = new String[10];
         this.roomPosition = startRoom;
+
         this.roomLog.add(startRoom);
         //System.out.println(roomPosition);
     }
@@ -74,6 +76,7 @@ class Player extends MapSite {
     //check for this function
     public void makePlayerMove(Door doorBetweenRooms){
         this.roomPosition = doorBetweenRooms.getDestinationRoom() ;
+
         if(!roomLog.contains(doorBetweenRooms.getDestinationRoom()))
             roomLog.pop();
         else
@@ -243,7 +246,6 @@ class Maze {
                 return roomComp;
             }
         }
-
         //in case it cannot find any room that matches the parameter
         return roomList.get(0);
     }
@@ -990,26 +992,24 @@ public class Zork {
         else if(words.contains("GO")) {
             if(words.contains("EAST") && player.getPosition().getSide(Direction.East).getName().equals("door")) {
                 //return false if the direction has a wall
-                x = false;
+                x = true;
             }
             else if(words.contains("WEST") && player.getPosition().getSide(Direction.West).getName().equals("door")){
-                x = false;
+                x = true;
             }
             else if(words.contains("NORTH") && player.getPosition().getSide(Direction.North).getName().equals("door")){
-                x = false;
+                x = true;
             }
             else if(words.contains("SOUTH") && player.getPosition().getSide(Direction.South).getName().equals("door")){
-                x = false;
+                x = true;
             }
             else{
-                System.out.println("valid move you can go that way");
+                System.out.println("invalid move you can not go that way");
                 x = true;
             }
             return x;
         }
         return x;
     }
-
-
 
 }
