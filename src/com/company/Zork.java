@@ -73,20 +73,19 @@ class Player extends MapSite {
         this.roomPosition = destinationRoom;
     }
 
-    //check for this function
-    public void makePlayerMove(Door doorBetweenRooms){
-        this.roomPosition = doorBetweenRooms.getDestinationRoom() ;
-
-        if(!roomLog.contains(doorBetweenRooms.getDestinationRoom()))
-            roomLog.pop();
+    //this function is used to update player position
+    public void updatePlayer(Room destinationRoom){
+        this.roomPosition = destinationRoom;
+        if(!roomLog.contains(destinationRoom)){
+            roomLog.push(destinationRoom);
+        }
         else
-            roomLog.push(doorBetweenRooms.getDestinationRoom());
-
+            roomLog.pop();
     }
 
     public void enter() {}
 
-    //this function to check for the valid more
+    //this function to check for the valid move
 
 }
 
@@ -147,7 +146,9 @@ class Room extends MapSite {
         }
         return result;
     }
-    //method toString() inside Room
+
+
+        //method toString() inside Room
 //    public String toString(){
 //        return "Room number" + Integer.toString(roomNumber);
 //    }
@@ -194,8 +195,8 @@ class Door extends MapSite{
     private Room roomDestination;
 
     //constructor for door
-    public Door(Room r1, Room r2, String doorName){
-        super(doorName,"");
+    public Door(Room r1, Room r2, String doorName, String destinationRoom){
+        super(doorName,destinationRoom);
         doorNumber = doorCount++;
         //System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
         this.roomStart = r1;
@@ -209,6 +210,22 @@ class Door extends MapSite{
         return roomStart;
     }
 
+//    //need to find a way
+//    public Door convertToDoor (Room room){
+//        if(room.getSide(Direction.North).getName().equals("door")){
+//            return (Door) room.getSide(Direction.North);
+//        }
+//        else if (room.getSide(Direction.South).getName().equals("door")){
+//            return (Door) room.getSide(Direction.South);
+//        }
+//        else if (room.getSide(Direction.East).getName().equals("door")){
+//            return (Door) room.getSide(Direction.East);
+//        }
+//        else if (room.getSide(Direction.West).getName().equals("door")){
+//            return (Door) room.getSide(Direction.West);
+//        }
+//        return null;
+//    }
 
     //method toString() inside Door
     public String toString(){
@@ -596,13 +613,13 @@ class MazeGame { //this is where the factory for the zork game happens
 
     public Wall makeWall(){return new Wall();}
 
-    public Door makeDoor(Room r1, Room r2, String newDoorName){ return new Door(r1,r2, newDoorName);}
+    public Door makeDoor(Room r1, Room r2, String newDoorName, String destinationRoom){ return new Door(r1,r2, newDoorName, destinationRoom);}
 
     public Maze createMaze(){
         Maze aMaze = makeMaze();
         Room r1 = makeRoom("room1");
         Room r2 = makeRoom("room2");
-        Door theDoor = makeDoor(r1, r2, "the door");
+        Door theDoor = makeDoor(r1, r2, "the door", "");
         aMaze.addRoom(r1);
         aMaze.addRoom(r2);
         return aMaze;
@@ -654,41 +671,41 @@ class ZorkUnderground extends MazeGame{
         Room newDragonLair = makeRoom("DragonLair");
         Room newTreasureRoom = makeRoom("TreasureRoom");
 
-        Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom, "door");
-        Door newLavaRoomAndCellarDoor = makeDoor(newLavaRoom, newCellar, "door");
+        Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom, "door", "LavaRoom");
+        Door newLavaRoomAndCellarDoor = makeDoor(newLavaRoom, newCellar, "door", "Cellar");
 
-        Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom,"door");
-        Door newEgyptRoomAndLavaRoomDoor = makeDoor(newEgyptRoom, newLavaRoom, "door");
+        Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom,"door", "EgyptRoom");
+        Door newEgyptRoomAndLavaRoomDoor = makeDoor(newEgyptRoom, newLavaRoom, "door", "LavaRoom");
 
-        Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom,"door");
-        Door newRegenerationRoomAndEgyptRoomDoor = makeDoor(newRegenerationRoom, newEgyptRoom, "door");
+        Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom,"door", "RegenerationRoom");
+        Door newRegenerationRoomAndEgyptRoomDoor = makeDoor(newRegenerationRoom, newEgyptRoom, "door", "EgyptRoom");
 
-        Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine, "door");
-        Door newCoalMineAndRegenerationRoomDoor = makeDoor(newCoalMine, newRegenerationRoom, "door");
+        Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine, "door", "CoalMine");
+        Door newCoalMineAndRegenerationRoomDoor = makeDoor(newCoalMine, newRegenerationRoom, "door", "RegenerationRoom");
 
-        Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine,"door");
-        Door newCoalMineAndEgyptRoomDoor = makeDoor(newCoalMine, newEgyptRoom, "door");
+        Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine,"door", "CoalMine");
+        Door newCoalMineAndEgyptRoomDoor = makeDoor(newCoalMine, newEgyptRoom, "door", "EgyptRoom");
 
-        Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave,"door");
-        Door newGlacierCaveAndRegenerationDoor = makeDoor(newGlacierCave, newRegenerationRoom, "door");
+        Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave,"door","GlacierCave");
+        Door newGlacierCaveAndRegenerationDoor = makeDoor(newGlacierCave, newRegenerationRoom, "door", "RegenerationRoom");
 
-        Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop,"door");
-        Door newBlacksmithWorkShopAndCoalMineDoor = makeDoor(newBlacksmithWorkshop, newCoalMine, "door");
+        Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop,"door", "BlacksmithWorkshop");
+        Door newBlacksmithWorkShopAndCoalMineDoor = makeDoor(newBlacksmithWorkshop, newCoalMine, "door", "CoalMine");
 
-        Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop,"door");
-        Door newBlacksmithWorkshopAndGlacierCaveDoor = makeDoor(newBlacksmithWorkshop, newGlacierCave, "door");
+        Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop,"door", "BlacksmithWorkshop");
+        Door newBlacksmithWorkshopAndGlacierCaveDoor = makeDoor(newBlacksmithWorkshop, newGlacierCave, "door","GlacierCave");
 
-        Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom,"door");
-        Door newTrollRoomAndGlacierCaveDoor = makeDoor(newTrollRoom, newGlacierCave, "door");
+        Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom,"door", "TrollRoom");
+        Door newTrollRoomAndGlacierCaveDoor = makeDoor(newTrollRoom, newGlacierCave, "door", "GlacierCave");
 
-        Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom,"door");
-        Door newRiddleRoomAndTrollRoomDoor = makeDoor(newRiddleRoom, newTrollRoom, "door");
+        Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom,"door","RiddleRoom");
+        Door newRiddleRoomAndTrollRoomDoor = makeDoor(newRiddleRoom, newTrollRoom, "door","TrollRoom");
 
-        Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair,"door");
-        Door newDragonLairAndRiddleRoomDoor = makeDoor(newDragonLair, newTrollRoom, "door");
+        Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair,"door","DragonLair");
+        Door newDragonLairAndRiddleRoomDoor = makeDoor(newDragonLair, newTrollRoom, "door","RiddleRoom");
 
-        Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom,"door");
-        Door newTreasureRoomAndDragonLairDoor = makeDoor(newTreasureRoom, newDragonLair, "door");
+        Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom,"door","TreasureRoom");
+        Door newTreasureRoomAndDragonLairDoor = makeDoor(newTreasureRoom, newDragonLair, "door","DragonLair");
 
 
         ZorkMazeUnderground.addRoom(newCellar);
@@ -804,16 +821,16 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         Room newGrassyFields = makeRoom("GrassyFields");
 
         //gotta add a connection to the kitchen and the attic
-        Door newLivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen,"door");
-        Door newKitchenAndLivingRoomDoor = makeDoor(newKitchen, newLivingRoom, "door");
+        Door newLivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen,"door", "Kitchen");
+        Door newKitchenAndLivingRoomDoor = makeDoor(newKitchen, newLivingRoom, "door","LivingRoom");
 
         //"door" to the attic
-        Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic,"door");
-        Door newAtticAndKitchenDoor = makeDoor(newAttic, newKitchen, "door");
+        Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic,"door","Attic");
+        Door newAtticAndKitchenDoor = makeDoor(newAttic, newKitchen, "door","Kitchen");
 
         //connect grassyfields to the living room
-        Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom,"door");
-        Door newLivingRoomAndGrassyFieldDoor = makeDoor(newLivingRoom, newGrassyFields, "door");
+        Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom,"door","LivingRoom");
+        Door newLivingRoomAndGrassyFieldDoor = makeDoor(newLivingRoom, newGrassyFields, "door","GrassyField");
 
         ZorkMaze.addRoom(newLivingRoom);
         ZorkMaze.addRoom(newKitchen);
@@ -831,16 +848,16 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         newLivingRoom.setSide(Direction.West, newLivingRoomAndGrassyFieldDoor);
 
         //walls for the kitchen
-        newKitchen.setSide(Direction.North, makeWall());
+        newKitchen.setSide(Direction.North, newKitchenDoorAndAttic);
         newKitchen.setSide(Direction.South, makeWall());
         newKitchen.setSide(Direction.West, newKitchenAndLivingRoomDoor);
         newKitchen.setSide(Direction.East, makeWall());
 
         //walls for the attic
         newAttic.setSide(Direction.North, makeWall());
-        newAttic.setSide(Direction.South, makeWall());
+        newAttic.setSide(Direction.South, newAtticAndKitchenDoor);
         newAttic.setSide(Direction.West, makeWall());
-        newAttic.setSide(Direction.East, newKitchenDoorAndAttic);
+        newAttic.setSide(Direction.East, makeWall());
 
         //"walls" for the grassy fields
         newGrassyFields.setSide(Direction.North, makeWall());
@@ -884,7 +901,7 @@ public class Zork {
             }
             else if(checkLegitCommand(list)){ //this function is for checking if the command is correct
                 if(isValidMove(newPlayer, list)) { //this is to check if they input any of the keywords
-
+                    newPlayer.updatePlayer(getDestinationRoom(maze, newPlayer));
                 }
                 else if(!isValidMove(newPlayer, list)){
                     System.out.println("Please input a valid command.");
@@ -1011,5 +1028,196 @@ public class Zork {
         }
         return x;
     }
-
+    public static Room getDestinationRoom(Maze maze, Player newPlayer){
+        //check if there is a door at North side
+        if(newPlayer.getPosition().getSide(Direction.North).getName().equals("door")){
+            //check what the destinationRoom the door contain
+            if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("LivingRoom")){
+                return maze.getRoom("LivingRoom");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.North).getDescription().equals("Kitchen")){
+                return maze.getRoom("Kitchen");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.North).getDescription().equals("Attic")){
+                return maze.getRoom("Attic");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.North).getDescription().equals("Cellar")){
+                return maze.getRoom("Cellar");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.North).getDescription().equals("CoalMine")){
+                return maze.getRoom("CoalMine");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("DragonLair")){
+                return maze.getRoom("DragonLair");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("EgyptRoom")){
+                return maze.getRoom("EgyptRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("GlacierCave")){
+                return maze.getRoom("GlacierCave");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("GrassyFields")){
+                return maze.getRoom("GrassyFields");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("LavaRoom")){
+                return maze.getRoom("LavaRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("RegenerationRoom")){
+                return maze.getRoom("RegenerationRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("RiddleRoom")){
+                return maze.getRoom("RiddleRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("TrollRoom")){
+                return maze.getRoom("TrollRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.North).getDescription().equals("TreasureRoom")){
+                return maze.getRoom("TreasureRoom");
+            }
+            else
+                return null;
+        }
+        else if(newPlayer.getPosition().getSide(Direction.South).getName().equals("door")){
+            //check what the destinationRoom the door contain
+            if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("LivingRoom")){
+                return maze.getRoom("LivingRoom");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.South).getDescription().equals("Kitchen")){
+                return maze.getRoom("Kitchen");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.South).getDescription().equals("Attic")){
+                return maze.getRoom("Attic");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.South).getDescription().equals("Cellar")){
+                return maze.getRoom("Cellar");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.South).getDescription().equals("CoalMine")){
+                return maze.getRoom("CoalMine");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("DragonLair")){
+                return maze.getRoom("DragonLair");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("EgyptRoom")){
+                return maze.getRoom("EgyptRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("GlacierCave")){
+                return maze.getRoom("GlacierCave");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("GrassyFields")){
+                return maze.getRoom("GrassyFields");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("LavaRoom")){
+                return maze.getRoom("LavaRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("RegenerationRoom")){
+                return maze.getRoom("RegenerationRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("RiddleRoom")){
+                return maze.getRoom("RiddleRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("TrollRoom")){
+                return maze.getRoom("TrollRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.South).getDescription().equals("TreasureRoom")){
+                return maze.getRoom("TreasureRoom");
+            }
+            else
+                return null;
+        }
+        else if(newPlayer.getPosition().getSide(Direction.East).getName().equals("door")){
+            //check what the destinationRoom the door contain
+            if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("LivingRoom")){
+                return maze.getRoom("LivingRoom");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.East).getDescription().equals("Kitchen")){
+                return maze.getRoom("Kitchen");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.East).getDescription().equals("Attic")){
+                return maze.getRoom("Attic");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.East).getDescription().equals("Cellar")){
+                return maze.getRoom("Cellar");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.East).getDescription().equals("CoalMine")){
+                return maze.getRoom("CoalMine");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("DragonLair")){
+                return maze.getRoom("DragonLair");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("EgyptRoom")){
+                return maze.getRoom("EgyptRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("GlacierCave")){
+                return maze.getRoom("GlacierCave");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("GrassyFields")){
+                return maze.getRoom("GrassyFields");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("LavaRoom")){
+                return maze.getRoom("LavaRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("RegenerationRoom")){
+                return maze.getRoom("RegenerationRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("RiddleRoom")){
+                return maze.getRoom("RiddleRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("TrollRoom")){
+                return maze.getRoom("TrollRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.East).getDescription().equals("TreasureRoom")){
+                return maze.getRoom("TreasureRoom");
+            }
+            else
+                return null;
+        }
+        else if(newPlayer.getPosition().getSide(Direction.West).getName().equals("door")){
+            //check what the destinationRoom the door contain
+            if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("LivingRoom")){
+                return maze.getRoom("LivingRoom");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.West).getDescription().equals("Kitchen")){
+                return maze.getRoom("Kitchen");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.West).getDescription().equals("Attic")){
+                return maze.getRoom("Attic");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.West).getDescription().equals("Cellar")){
+                return maze.getRoom("Cellar");
+            }
+            else if (newPlayer.getPosition().getSide(Direction.West).getDescription().equals("CoalMine")){
+                return maze.getRoom("CoalMine");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("DragonLair")){
+                return maze.getRoom("DragonLair");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("EgyptRoom")){
+                return maze.getRoom("EgyptRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("GlacierCave")){
+                return maze.getRoom("GlacierCave");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("GrassyFields")){
+                return maze.getRoom("GrassyFields");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("LavaRoom")){
+                return maze.getRoom("LavaRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("RegenerationRoom")){
+                return maze.getRoom("RegenerationRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("RiddleRoom")){
+                return maze.getRoom("RiddleRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("TrollRoom")){
+                return maze.getRoom("TrollRoom");
+            }
+            else if(newPlayer.getPosition().getSide(Direction.West).getDescription().equals("TreasureRoom")){
+                return maze.getRoom("TreasureRoom");
+            }
+            else
+                return null;
+        }
+        return null;
+    }
 }
