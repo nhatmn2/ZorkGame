@@ -1,10 +1,7 @@
 package src.com.company;
 //package com.company;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 final class Direction {
     private String directionName;
@@ -29,6 +26,10 @@ abstract class MapSite{
     private String name;
     private String description;
 
+    public MapSite(String newName, String newDescription) {
+        this.name = newName;
+        this.description = newDescription;
+    }
     public String getName() {return  name;}
     public void setName(String newName){ this.name = newName;}
 
@@ -38,6 +39,30 @@ abstract class MapSite{
     abstract void enter();
 }
 
+//========================================================================
+// Abstract Monster
+//========================================================================
+abstract class Monster {
+    protected int health;
+    protected int damage;
+    protected String monsterDescription;
+
+    public int getDamage() { return damage; }
+
+    public String getMonsterDescription() { return monsterDescription; }
+}
+
+//=========================================================================
+// Monsters
+//=========================================================================
+class Slime extends Monster {
+    public Slime() {
+       this.health = 10;
+       this.damage = 1;
+       this.monsterDescription = "Slime";
+    }
+}
+
 //==================================================================
 // Player Class
 //==================================================================
@@ -45,15 +70,19 @@ class Player extends MapSite {
     private int health;
     private String[] sack;
     private Room roomPosition;  //the room at which the player present
+    private Stack<Room> roomLog = new Stack<>(); //this is to keep track of the room player has visited
+
     //private String name; //I leave it hear if you want to have the player's name
 
 
     //constructor for creating the player
     public Player(Room startRoom){
+        super("player 1", "this is player 1");
         this.health = 100;
         this.sack = new String[10];
         this.roomPosition = startRoom;
-        System.out.println(roomPosition);
+        this.roomLog.add(startRoom);
+        //System.out.println(roomPosition);
     }
 
     //this function is used to get the player position (i.e in what room)
@@ -66,7 +95,20 @@ class Player extends MapSite {
         this.roomPosition = destinationRoom;
     }
 
-    public void enter() { }
+    //check for this function
+    public void makePlayerMove(Door doorBetweenRooms){
+        this.roomPosition = doorBetweenRooms.getDestinationRoom() ;
+        if(!roomLog.contains(doorBetweenRooms.getDestinationRoom()))
+            roomLog.pop();
+        else
+            roomLog.push(doorBetweenRooms.getDestinationRoom());
+
+    }
+
+    public void enter() {}
+
+    //this function to check for the valid more
+
 }
 
 //============================================================================================================
@@ -84,11 +126,13 @@ class Room extends MapSite {
     private MapSite westSide;
 
     //constructor for room
-    public Room() {
+    public Room(String roomName, String roomDescription) {
+        super(roomName, roomDescription);
         roomNumber = roomCount++;
-        System.out.println("creating room number " + roomNumber);
+        //System.out.println("creating room number " + roomNumber);
 
     }
+
 
     //method setSide() inside Room
     public void setSide(Direction d, MapSite site){
@@ -104,7 +148,7 @@ class Room extends MapSite {
         else if (d == Direction.West){
             westSide = site;
         }
-        System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
+        //System.out.println("setting " + d.toString() + " side of " + this.toString() + " to " + site.toString());
     }
 
     //method getSide() inside Room
@@ -124,7 +168,6 @@ class Room extends MapSite {
         }
         return result;
     }
-
     //method toString() inside Room
 //    public String toString(){
 //        return "Room number" + Integer.toString(roomNumber);
@@ -133,6 +176,8 @@ class Room extends MapSite {
     void enter(){
         System.out.println("enter to Room " + roomNumber);
     }
+
+
 
 }
 //=======================================================================================================
@@ -145,6 +190,7 @@ class Wall extends MapSite{
 
     //constructor for wall
     public Wall(){
+        super("","");
         wallNumber = wallCount++;
         System.out.println("creating Wall number" +  Integer.toString(wallNumber));
     }
@@ -165,24 +211,34 @@ class Wall extends MapSite{
 class Door extends MapSite{
     private int doorNumber;
     private static int doorCount = 1;
-    private Room room1;
-    private Room room2;
+    private Room roomStart;
+    private Room roomDestination;
 
     //constructor for door
-    public Door(Room r1, Room r2){
+    public Door(Room r1, Room r2, String doorName){
+        super(doorName,"");
         doorNumber = doorCount++;
-        System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
-        this.room1 = r1;
-        this.room2 = r2;
+        //System.out.println("creating a door number " + doorNumber + " between " + r1 + " and " + r2);
+        this.roomStart = r1;
+        this.roomDestination = r2;
     }
+
+    public Room getDestinationRoom(){
+        return roomDestination;
+    }
+    public Room getStartRoom(){
+        return roomStart;
+    }
+
 
     //method toString() inside Door
     public String toString(){
         return "Door number " + Integer.toString(doorNumber);
     }
 
+
     void enter(){
-        System.out.println("Enter through " + doorNumber + " from " + room1 + " to " + room2);
+        //System.out.println("Enter through " + doorNumber + " from " + room1 + " to " + room2);
     }
 
 }
@@ -195,7 +251,7 @@ class Maze {
     private List<Room> roomList = new ArrayList<Room>();
 
     public Maze(){
-        System.out.println("creating a Maze ");
+        //System.out.println("creating a Maze ");
     }
 
     void addRoom(Room r){
@@ -213,8 +269,9 @@ class Maze {
         }
 
         //in case it cannot find any room that matches the parameter
-        return roomList.get(3);
+        return roomList.get(0);
     }
+
 
     public void showRoomList() {
         for(Room roomInMaze : roomList){
@@ -254,15 +311,15 @@ class ItemList {
 class LivingRoom extends Room {
     //create livingRoom with tools
     private MazeGame underground;
-    private final String description = "You are entering the living room. In here you can find all the tool you need for your journey\n";
+    //private final String description = "You are entering the living room. In here you can find all the tool you need for your journey\n";
     //when the livingRoom is created the livingRoomItemList is also created
     LivingRoom() {
-        super();
+        super("living room", "you are entering the living room");
         //I created another underground Maze after you enter the cellar.
         //this.underground = newMaze;
         //System.out.println(description);
         //this is for creating item list inside living room!
-        getDescription();
+        //getDescription();
         ItemList livingRoomItemList = new ItemList();
         livingRoomItemList.addItems("Trophy case");
         livingRoomItemList.addItems("Lamp");
@@ -270,9 +327,10 @@ class LivingRoom extends Room {
         livingRoomItemList.addItems("Old Sword");
         livingRoomItemList.showItemList();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
+
     public String toString() {
         return "living room";
     }
@@ -297,11 +355,11 @@ class LivingRoom extends Room {
 class Kitchen extends Room {
     //create kitchen with tools
     //can add description of the kitchen later
-    private final String description = "You are entering the kitchen.";
+    //private final String description = "You are entering the kitchen.";
     Kitchen() {
-        super();
+        super("kitchen", "You are entering the kitchen");
         //System.out.println(description);
-        getDescription();
+        //getDescription();
         ItemList kitchenItemList = new ItemList();
         kitchenItemList.addItems("Sack");
         kitchenItemList.addItems("Garlic");
@@ -309,9 +367,9 @@ class Kitchen extends Room {
         kitchenItemList.showItemList();
     }
 
-    public String getDescription() {
-        return description;
-    }
+//    public String getDescription() {
+//        return description;
+//    }
 
     public String toString() {
         return "kitchen";
@@ -326,20 +384,20 @@ class Kitchen extends Room {
 class Attic extends Room {
     //don't forget to create items for the attic
 
-    private final String description = "You are entering the attic.";
+    //private final String description = "You are entering the attic.";
     Attic() {
-        super();
+        super("attic", "You are entering the attic");
         //System.out.println(description);
-        getDescription();
+        //getDescription();
         ItemList atticItemList = new ItemList();
         atticItemList.addItems("Rope");
         atticItemList.addItems("Brick");
         atticItemList.addItems("Axe");
         atticItemList.showItemList(); //just to test whether the items are showing up
     }
-    public String getDescription() {
-        return description;
-    }
+//    public String getDescription() {
+//        return description;
+//    }
 
     public String toString() { return "attic"; }
 }
@@ -350,13 +408,13 @@ class Attic extends Room {
 class GrassyFields extends Room{
     //we're gonna have to implement a getCommand and a putWordsTogether function in each room
 
-    private final String description = "You are in a grassy field.";
+    //private final String description = "You are in a grassy field.";
     GrassyFields() {
-        super();
-        System.out.println(description);
-        setName("Grassy Fields");
+        super("grassy fields", "You are in a grassy field");
+        //System.out.println(description);
+        //setName("Grassy Fields");
     }
-    public String getDescription() { return description; }
+    //public String getDescription() { return description; }
 
     public String toString() { return "grassy field"; }
 }
@@ -365,14 +423,14 @@ class GrassyFields extends Room{
 //create Cellar
 //=======================================================================================================
 class Cellar extends Room {
-    private final String description = "You are entering the cellar.";
+    //private final String description = "You are entering the cellar.";
     Cellar() {
-        super();
-        getDescription();
+        super("cellar", "You are entering the cellar");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
 
     public String toString(){
         return "cellar";
@@ -384,14 +442,14 @@ class Cellar extends Room {
 //create Lava Room
 //======================================================================================================
 class LavaRoom extends Room{
-    private final String description  = "You are entering the lava room. ";
+    //private final String description  = "You are entering the lava room. ";
     LavaRoom(){
-        super();
-        getDescription();
+        super("lava room", "you are entering lava room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+//    public String getDescription(){
+//        return description;
+//    }
 
     public String toString(){
         return "lava room.";
@@ -404,12 +462,12 @@ class LavaRoom extends Room{
 class RegenerationRoom extends Room{
     private final String description = "You are entering the regenerating room.";
     RegenerationRoom(){
-        super();
-        getDescription();
+        super("regeneration room", "You are entering the regenerating room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "regenerating room.";
     }
@@ -419,14 +477,14 @@ class RegenerationRoom extends Room{
 //create Glacier Cave
 //======================================================================================================
 class GlacierCave extends Room{
-    private final String description = "You are entering the glacier cave.";
+    //private final String description = "You are entering the glacier cave.";
     GlacierCave(){
-        super();
-        getDescription();
+        super("glacier cave", "You are entering the glacier cave");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "glacier cave.";
     }
@@ -438,12 +496,12 @@ class GlacierCave extends Room{
 class EgyptRoom extends Room{
     private final String description = "You are entering the egypt room.";
     EgyptRoom(){
-        super();
-        getDescription();
+        super("egypt room","You are entering the egypt room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "Egypt room. ";
     }
@@ -452,14 +510,14 @@ class EgyptRoom extends Room{
 //create Coal Mine
 //======================================================================================================
 class CoalMine extends Room{
-    private final String description = "You are entering the coal mine.";
+    //private final String description = "You are entering the coal mine.";
     CoalMine(){
-        super();
+        super("coal mine", "You are entering the coal mine");
         getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "coal mine. ";
     }
@@ -468,14 +526,14 @@ class CoalMine extends Room{
 //create Blacksmith Workshop
 //======================================================================================================
 class BlacksmithWorkshop extends Room{
-    private final String description = "You are entering the Blacksmith Workshop.";
+    //private final String description = "You are entering the Blacksmith Workshop.";
     BlacksmithWorkshop(){
-        super();
+        super("blacksmith workshop", "You are entering the Blacksmith Workshop");
         getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "blacksmith workshop. ";
     }
@@ -485,14 +543,14 @@ class BlacksmithWorkshop extends Room{
 //create Troll Room
 //======================================================================================================
 class TrollRoom extends Room{
-    private final String description = "You are entering the Troll Room.";
+    //private final String description = "You are entering the Troll Room.";
     TrollRoom(){
-        super();
-        getDescription();
+        super("troll room", "You are entering the Troll Room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "troll room. ";
     }
@@ -504,12 +562,12 @@ class TrollRoom extends Room{
 class RiddleRoom extends Room{
     private final String description = "You are entering the Riddle Room.";
     RiddleRoom(){
-        super();
-        getDescription();
+        super("riddle room", "You are entering the Riddle Room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "riddle room. ";
     }
@@ -519,14 +577,14 @@ class RiddleRoom extends Room{
 //create Dragon's Lair
 //======================================================================================================
 class DragonLair extends Room{
-    private final String description = "You are entering the Dragon's Lair.";
+    //private final String description = "You are entering the Dragon's Lair.";
     DragonLair(){
-        super();
-        getDescription();
+        super("dragon lair", "You are entering the dragon's lair");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "dragon's lair. ";
     }
@@ -535,14 +593,14 @@ class DragonLair extends Room{
 //create Treasure Room
 //======================================================================================================
 class TreasureRoom extends Room{
-    private final String description = "You are entering the Treasure Room.";
+    //private final String description = "You are entering the Treasure Room.";
     TreasureRoom(){
-        super();
-        getDescription();
+        super("treasure room", "You are entering the treasure room");
+        //getDescription();
     }
-    public String getDescription(){
-        return description;
-    }
+    //    public String getDescription(){
+//        return description;
+//    }
     public String toString(){
         return "treasure room. ";
     }
@@ -553,21 +611,25 @@ class TreasureRoom extends Room{
 class MazeGame { //this is where the factory for the zork game happens
     public Maze makeMaze(){return new Maze();}
 
-    public Room makeRoom(){return new Room();}
+    public Room makeRoom(String newName){
+        return new Room(newName,"");
+    }
+
 
     public Wall makeWall(){return new Wall();}
 
-    public Door makeDoor(Room r1, Room r2){ return new Door(r1,r2);}
+    public Door makeDoor(Room r1, Room r2, String newDoorName){ return new Door(r1,r2, newDoorName);}
 
     public Maze createMaze(){
         Maze aMaze = makeMaze();
-        Room r1 = makeRoom();
-        Room r2 = makeRoom();
-        Door theDoor = makeDoor(r1, r2);
+        Room r1 = makeRoom("room1");
+        Room r2 = makeRoom("room2");
+        Door theDoor = makeDoor(r1, r2, "the door");
         aMaze.addRoom(r1);
         aMaze.addRoom(r2);
         return aMaze;
     }
+
 }
 //=========================================================================================================
 //create an underground map
@@ -597,7 +659,7 @@ class ZorkUnderground extends MazeGame{
         else if (kindOfRoomUnderground.equals("TreasureRoom"))
             return new TreasureRoom();
         else
-            return new Room();
+            return new Room("","");
     }
     public Maze createMaze(){
         Maze ZorkMazeUnderground = makeMaze();
@@ -614,18 +676,42 @@ class ZorkUnderground extends MazeGame{
         Room newDragonLair = makeRoom("DragonLair");
         Room newTreasureRoom = makeRoom("TreasureRoom");
 
-        Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom);
-        Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom);
-        Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom);
-        Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine);
-        Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine);
-        Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave);
-        Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop);
-        Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop);
-        Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom);
-        Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom);
-        Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair);
-        Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom);
+        Door newCellarAndLavaRoomDoor = makeDoor(newCellar, newLavaRoom, "door");
+        Door newLavaRoomAndCellarDoor = makeDoor(newLavaRoom, newCellar, "door");
+
+        Door newLavaRoomAndEgyptRoomDoor = makeDoor(newLavaRoom, newEgyptRoom,"door");
+        Door newEgyptRoomAndLavaRoomDoor = makeDoor(newEgyptRoom, newLavaRoom, "door");
+
+        Door newEgyptRoomAndRegenerationRoomDoor = makeDoor(newEgyptRoom, newRegenerationRoom,"door");
+        Door newRegenerationRoomAndEgyptRoomDoor = makeDoor(newRegenerationRoom, newEgyptRoom, "door");
+
+        Door newRegenerationRoomAndCoalMineDoor = makeDoor(newRegenerationRoom, newCoalMine, "door");
+        Door newCoalMineAndRegenerationRoomDoor = makeDoor(newCoalMine, newRegenerationRoom, "door");
+
+        Door newEgyptRoomAndCoalMineDoor = makeDoor(newEgyptRoom, newCoalMine,"door");
+        Door newCoalMineAndEgyptRoomDoor = makeDoor(newCoalMine, newEgyptRoom, "door");
+
+        Door newRegenerationRoomAndGlacierCaveDoor = makeDoor(newRegenerationRoom, newGlacierCave,"door");
+        Door newGlacierCaveAndRegenerationDoor = makeDoor(newGlacierCave, newRegenerationRoom, "door");
+
+        Door newCoalMineAndBlacksmithWorkshopDoor = makeDoor(newCoalMine, newBlacksmithWorkshop,"door");
+        Door newBlacksmithWorkShopAndCoalMineDoor = makeDoor(newBlacksmithWorkshop, newCoalMine, "door");
+
+        Door newGlacierCaveAndBlacksmithWorkshopDoor = makeDoor(newGlacierCave, newBlacksmithWorkshop,"door");
+        Door newBlacksmithWorkshopAndGlacierCaveDoor = makeDoor(newBlacksmithWorkshop, newGlacierCave, "door");
+
+        Door newGlacierCaveAndTrollRoomDoor = makeDoor(newGlacierCave, newTrollRoom,"door");
+        Door newTrollRoomAndGlacierCaveDoor = makeDoor(newTrollRoom, newGlacierCave, "door");
+
+        Door newTrollRoomAndRiddleRoomDoor = makeDoor(newTrollRoom, newRiddleRoom,"door");
+        Door newRiddleRoomAndTrollRoomDoor = makeDoor(newRiddleRoom, newTrollRoom, "door");
+
+        Door newRiddleRoomAndDragonLairDoor = makeDoor(newTrollRoom, newDragonLair,"door");
+        Door newDragonLairAndRiddleRoomDoor = makeDoor(newDragonLair, newTrollRoom, "door");
+
+        Door newDragonLairAndTreasureRoomDoor = makeDoor(newDragonLair, newTreasureRoom,"door");
+        Door newTreasureRoomAndDragonLairDoor = makeDoor(newTreasureRoom, newDragonLair, "door");
+
 
         ZorkMazeUnderground.addRoom(newCellar);
         ZorkMazeUnderground.addRoom(newLavaRoom);
@@ -639,12 +725,12 @@ class ZorkUnderground extends MazeGame{
         //setting sides for lava room
         newLavaRoom.setSide(Direction.North, newLavaRoomAndEgyptRoomDoor);
         newLavaRoom.setSide(Direction.South, makeWall());
-        newLavaRoom.setSide(Direction.East, newCellarAndLavaRoomDoor);
+        newLavaRoom.setSide(Direction.East, newLavaRoomAndCellarDoor);
         newLavaRoom.setSide(Direction.West, makeWall());
 
         //setting sides for egypt room
         newEgyptRoom.setSide(Direction.North, newEgyptRoomAndRegenerationRoomDoor);
-        newEgyptRoom.setSide(Direction.South, newLavaRoomAndEgyptRoomDoor);
+        newEgyptRoom.setSide(Direction.South, newEgyptRoomAndLavaRoomDoor);
         newEgyptRoom.setSide(Direction.East, newEgyptRoomAndCoalMineDoor);
         newEgyptRoom.setSide(Direction.West, makeWall());
 
@@ -652,40 +738,40 @@ class ZorkUnderground extends MazeGame{
         newRegenerationRoom.setSide(Direction.North, makeWall());
         newRegenerationRoom.setSide(Direction.South, newRegenerationRoomAndCoalMineDoor);
         newRegenerationRoom.setSide(Direction.East, newRegenerationRoomAndGlacierCaveDoor);
-        newRegenerationRoom.setSide(Direction.West, newEgyptRoomAndRegenerationRoomDoor);
+        newRegenerationRoom.setSide(Direction.West, newRegenerationRoomAndEgyptRoomDoor);
 
         //setting sides for coal mine
-        newCoalMine.setSide(Direction.North, newRegenerationRoomAndCoalMineDoor);
+        newCoalMine.setSide(Direction.North, newCoalMineAndRegenerationRoomDoor);
         newCoalMine.setSide(Direction.South, makeWall());
         newCoalMine.setSide(Direction.East, newCoalMineAndBlacksmithWorkshopDoor);
-        newCoalMine.setSide(Direction.West, newEgyptRoomAndCoalMineDoor);
+        newCoalMine.setSide(Direction.West, newCoalMineAndEgyptRoomDoor);
 
         //setting sides for glacier cave
         newGlacierCave.setSide(Direction.North, makeWall());
         newGlacierCave.setSide(Direction.South, newGlacierCaveAndBlacksmithWorkshopDoor);
         newGlacierCave.setSide(Direction.East, newGlacierCaveAndTrollRoomDoor);
-        newGlacierCave.setSide(Direction.West, newRegenerationRoomAndGlacierCaveDoor);
+        newGlacierCave.setSide(Direction.West, newGlacierCaveAndRegenerationDoor);
 
         //setting sides for blacksmithWorkshop
-        newBlacksmithWorkshop.setSide(Direction.North, newGlacierCaveAndBlacksmithWorkshopDoor);
+        newBlacksmithWorkshop.setSide(Direction.North, newBlacksmithWorkshopAndGlacierCaveDoor);
         newBlacksmithWorkshop.setSide(Direction.South, makeWall());
-        newBlacksmithWorkshop.setSide(Direction.East, newGlacierCaveAndTrollRoomDoor);
-        newBlacksmithWorkshop.setSide(Direction.West, newCoalMineAndBlacksmithWorkshopDoor);
+        newBlacksmithWorkshop.setSide(Direction.East, makeWall());
+        newBlacksmithWorkshop.setSide(Direction.West, newBlacksmithWorkShopAndCoalMineDoor);
 
         //setting sides for troll room
         newTrollRoom.setSide(Direction.North, makeWall());
         newTrollRoom.setSide(Direction.South, newTrollRoomAndRiddleRoomDoor);
         newTrollRoom.setSide(Direction.East, makeWall());
-        newTrollRoom.setSide(Direction.West, newGlacierCaveAndTrollRoomDoor);
+        newTrollRoom.setSide(Direction.West, newTrollRoomAndGlacierCaveDoor);
 
         //setting sides for riddle room
-        newRiddleRoom.setSide(Direction.North, newTrollRoomAndRiddleRoomDoor);
+        newRiddleRoom.setSide(Direction.North, newRiddleRoomAndTrollRoomDoor);
         newRiddleRoom.setSide(Direction.South, newRiddleRoomAndDragonLairDoor);
         newRiddleRoom.setSide(Direction.East, makeWall());
         newRiddleRoom.setSide(Direction.West, makeWall());
 
         //setting sides for dragon lair
-        newDragonLair.setSide(Direction.North, newRiddleRoomAndDragonLairDoor);
+        newDragonLair.setSide(Direction.North, newDragonLairAndRiddleRoomDoor);
         newDragonLair.setSide(Direction.South, makeWall());
         newDragonLair.setSide(Direction.East, makeWall());
         newDragonLair.setSide(Direction.West, newDragonLairAndTreasureRoomDoor);
@@ -693,12 +779,13 @@ class ZorkUnderground extends MazeGame{
         //setting sides for treasure room
         newTreasureRoom.setSide(Direction.North, makeWall());
         newTreasureRoom.setSide(Direction.South, makeWall());
-        newTreasureRoom.setSide(Direction.East, newDragonLairAndTreasureRoomDoor);
+        newTreasureRoom.setSide(Direction.East, newTreasureRoomAndDragonLairDoor);
         newTreasureRoom.setSide(Direction.West, makeWall());
 
 
         return ZorkMazeUnderground;
     }
+
 }
 
 //=============================================================================
@@ -726,7 +813,7 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         else if(kindOfRoom.equals("GrassyFields"))
             return new GrassyFields();
         else
-            return new Room();
+            return new Room("","");
 
     }
     //override the create Maze
@@ -739,13 +826,16 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         Room newGrassyFields = makeRoom("GrassyFields");
 
         //gotta add a connection to the kitchen and the attic
-        Door newlivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen);
+        Door newLivingRoomAndKitchenDoor = makeDoor(newLivingRoom, newKitchen,"door");
+        Door newKitchenAndLivingRoomDoor = makeDoor(newKitchen, newLivingRoom, "door");
 
         //"door" to the attic
-        Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic);
+        Door newKitchenDoorAndAttic = makeDoor(newKitchen, newAttic,"door");
+        Door newAtticAndKitchenDoor = makeDoor(newAttic, newKitchen, "door");
 
         //connect grassyfields to the living room
-        Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom);
+        Door newGrassyFieldsAndLivingRoom = makeDoor(newGrassyFields, newLivingRoom,"door");
+        Door newLivingRoomAndGrassyFieldDoor = makeDoor(newLivingRoom, newGrassyFields, "door");
 
         ZorkMaze.addRoom(newLivingRoom);
         ZorkMaze.addRoom(newKitchen);
@@ -759,14 +849,14 @@ class ZorkMazeGame extends MazeGame{ //this is where you actually snap all the r
         //walls for the living room
         newLivingRoom.setSide(Direction.North, makeWall());
         newLivingRoom.setSide(Direction.South,makeWall());
-        newLivingRoom.setSide(Direction.East, makeWall());
-        newLivingRoom.setSide(Direction.West, newlivingRoomAndKitchenDoor);
+        newLivingRoom.setSide(Direction.East, newLivingRoomAndKitchenDoor);
+        newLivingRoom.setSide(Direction.West, newLivingRoomAndGrassyFieldDoor);
 
         //walls for the kitchen
         newKitchen.setSide(Direction.North, makeWall());
         newKitchen.setSide(Direction.South, makeWall());
-        newKitchen.setSide(Direction.West, makeWall());
-        newKitchen.setSide(Direction.East, newlivingRoomAndKitchenDoor);
+        newKitchen.setSide(Direction.West, newKitchenAndLivingRoomDoor);
+        newKitchen.setSide(Direction.East, makeWall());
 
         //walls for the attic
         newAttic.setSide(Direction.North, makeWall());
@@ -791,10 +881,13 @@ public class Zork {
         MazeGame game = new ZorkMazeGame();
         Maze maze = game.createMaze();
         maze.showRoomList();
-        System.out.println("Hello");
+        //System.out.println("Hello");
         System.out.println();
 
         Player newPlayer = new Player(maze.getRoom("Grassy Fields"));
+
+//        System.out.println();
+//        System.out.println(newPlayer.getPosition().getSide(Direction.East).getName());
 
         Scanner scan = new Scanner(System.in);
         String input = "";
@@ -811,7 +904,7 @@ public class Zork {
             if(list.isEmpty()) {
                 System.out.println("Please input a command.\n");
             }
-            else if(checkLegitCommand(list)){ //this still needs work, most likey rework checkLegitCommand
+            else if(checkLegitCommand(list)){ //this function is for checking if the command is correct
                 if(isValidMove(newPlayer, list)) { //this is to check if they input any of the keywords
 
                 }
@@ -823,17 +916,17 @@ public class Zork {
         }
 
         //most likely needs a loop here to check whether the game is finished or not
-/*        StartGame();*/
+        /*        StartGame();*/
     }
 
-    public static void StartGame() {
-        /*StartingPoints startingPoint = new StartingPoints();
-        startingPoint.grassyFieldsStart();*/
-    }
+//    public static void StartGame() {
+//        /*StartingPoints startingPoint = new StartingPoints();
+//        startingPoint.grassyFieldsStart();*/
+//    }
 
-    public void checkUserInput() {
-
-    }
+//    public void checkUserInput() {
+//
+//    }
 
     public static boolean checkLegitCommand(List<String> words) {
         String[] directions = {
@@ -911,31 +1004,33 @@ public class Zork {
         return legitCommand;
     }
 
-    //
+    //this function is for checking Valid Move --> valid move happened when there is a door at a certain direction
     public static boolean isValidMove(Player player, List<String> words) {
-        boolean x;
-
+        boolean x = false;
         if(words.contains("OPEN") && words.contains("DOOR")) {
             //create another starting point in the living room class
             x = true;
         }
         else if(words.contains("GO")) {
-            if(words.contains("EAST") && player.getPosition().getSide(Direction.East)) {
+            if(words.contains("EAST") && player.getPosition().getSide(Direction.East).getName().equals("door")) {
                 //return false if the direction has a wall
                 x = false;
             }
-            else {
-                //return true if that direction has a door
+            else if(words.contains("WEST") && player.getPosition().getSide(Direction.West).getName().equals("door")){
+                x = false;
+            }
+            else if(words.contains("NORTH") && player.getPosition().getSide(Direction.North).getName().equals("door")){
+                x = false;
+            }
+            else if(words.contains("SOUTH") && player.getPosition().getSide(Direction.South).getName().equals("door")){
+                x = false;
+            }
+            else{
+                System.out.println("Valid move. You can go that way.");
                 x = true;
             }
-
+            return x;
         }
-
-
         return x;
     }
-
-//    public static boolean isValidMove(List<String> words) {
-//
-//    }
 }
