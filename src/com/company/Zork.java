@@ -40,16 +40,30 @@ abstract class MapSite{
 }
 
 //========================================================================
+// Abstract item
+//========================================================================
+abstract class Item {
+    protected int damageValue;
+
+
+    abstract int getDamageValue();
+}
+
+//========================================================================
 // Abstract Monster
 //========================================================================
 abstract class Monster {
     protected int health;
     protected int damage;
     protected String monsterDescription;
+    protected String monsterName;
 
     public int getDamage() { return damage; }
-
+    public int getHealth() { return health; }
+    public String getName() { return monsterName; }
     public String getMonsterDescription() { return monsterDescription; }
+
+    public void setHealth(int health) { this.health = health; }
 }
 
 //=========================================================================
@@ -59,9 +73,22 @@ class Slime extends Monster {
     public Slime() {
        this.health = 10;
        this.damage = 1;
-       this.monsterDescription = "Slime";
+       this.monsterDescription = "A slimy but easy to deal with monster.";
+       this.monsterName = "Slime";
     }
 }
+
+//=========================================================================
+// Items
+//=========================================================================
+class Sword extends Item {
+    public Sword() {
+        this.damageValue = 25;
+    }
+
+    public int getDamageValue() { return damageValue; }
+}
+
 
 //==================================================================
 // Player Class
@@ -84,6 +111,9 @@ class Player extends MapSite {
         this.roomLog.add(startRoom);
         //System.out.println(roomPosition);
     }
+
+    //get health
+    public int getHealth() { return health; }
 
     //this function is used to get the player position (i.e in what room)
     public Room getPosition() {
@@ -885,6 +915,7 @@ public class Zork {
         System.out.println();
 
         Player newPlayer = new Player(maze.getRoom("Grassy Fields"));
+        Sword sword = new Sword();
 
 //        System.out.println();
 //        System.out.println(newPlayer.getPosition().getSide(Direction.East).getName());
@@ -938,12 +969,12 @@ public class Zork {
         //keywords for actions
         String[] actions = {
                 "ATTACK", "SEARCH", "UNLOCK", "JUMP", "TAKE", "LOOK", "GO", "OPEN",
-                "INVENTORY", "OPEN", "SAVE", "LOOK", "AROUND", "EXAMINE"
+                "INVENTORY", "OPEN", "SAVE", "LOOK", "AROUND", "EXAMINE", "USE"
         };
 
         //Might need an array of items
         String[] items = {
-                "LEAFLET", "MAILBOX", "WINDOW", "TROPHY", "SWORD"
+                "LEAFLET", "MAILBOX", "WINDOW", "TROPHY", "SWORD", "POTION"
         };
 
         List<String> keywords = new ArrayList<String>();
@@ -1009,28 +1040,65 @@ public class Zork {
         boolean x = false;
         if(words.contains("OPEN") && words.contains("DOOR")) {
             //create another starting point in the living room class
+            //use this to check if its a wrong move
             x = true;
         }
         else if(words.contains("GO")) {
             if(words.contains("EAST") && player.getPosition().getSide(Direction.East).getName().equals("door")) {
                 //return false if the direction has a wall
-                x = false;
+                x = true;
             }
             else if(words.contains("WEST") && player.getPosition().getSide(Direction.West).getName().equals("door")){
-                x = false;
+                x = true;
             }
             else if(words.contains("NORTH") && player.getPosition().getSide(Direction.North).getName().equals("door")){
-                x = false;
+                x = true;
             }
             else if(words.contains("SOUTH") && player.getPosition().getSide(Direction.South).getName().equals("door")){
-                x = false;
+                x = true;
             }
             else{
                 System.out.println("Valid move. You can go that way.");
-                x = true;
+                x = false;
             }
             return x;
         }
         return x;
+    }
+
+    public static String Battle(Player player, Monster monster) {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("=================================================");
+        System.out.println("A " + monster.getName() + " appeared!");
+
+        while(monster.getHealth() > 0) {
+            System.out.println("Your health: " + player.getHealth());
+            System.out.println("The enemies health: " + monster.getHealth());
+            System.out.println("What would you like to do? ");
+            System.out.println("1. Attack the monster");
+            System.out.println("2. Use an item");
+            System.out.println("3. Run [This will put you back to the previous room]");
+
+            String input = scan.nextLine();
+            if(input.equals("1")) {
+                //check whether they have a sword
+                if()
+            }
+            else if(input.equals("2")) {
+                //check how many potions the player has
+                if()
+            }
+            else if(input.equals("3")) {
+                System.out.println("You ran away from the " + monster.getName() + "!");
+                //monster will still be in that room
+                break;
+            }
+            else {
+                System.out.println("Please input a the given commands.");
+                continue;
+            }
+
+        }
+
     }
 }
