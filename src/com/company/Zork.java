@@ -120,6 +120,17 @@ class Player extends MapSite {
         return roomPosition;
     }
 
+    //searches the sack if that item exists
+    public boolean searchSack(String name) {
+        for(int i = 0; i < sack.length; ++i) {
+            if(sack.equals(name)) {
+                return true; //returns true if the item does exist
+            }
+        }
+        //returns false if the item inside the sack does not exist
+        return false;
+    }
+
     //this function is used to set the player position
     public void setRoom (Room destinationRoom){
         this.roomPosition = destinationRoom;
@@ -1066,27 +1077,40 @@ public class Zork {
         return x;
     }
 
-    public static String Battle(Player player, Monster monster) {
+    public static boolean Battle(Player player, Sword sword, Monster monster) {
         Scanner scan = new Scanner(System.in);
         System.out.println("=================================================");
         System.out.println("A " + monster.getName() + " appeared!");
 
         while(monster.getHealth() > 0) {
-            System.out.println("Your health: " + player.getHealth());
-            System.out.println("The enemies health: " + monster.getHealth());
-            System.out.println("What would you like to do? ");
-            System.out.println("1. Attack the monster");
-            System.out.println("2. Use an item");
-            System.out.println("3. Run [This will put you back to the previous room]");
+            System.out.println("\tYour health: " + player.getHealth());
+            System.out.println("\tThe enemies health: " + monster.getHealth());
+            System.out.println("\tWhat would you like to do? ");
+            System.out.println("\t1. Attack the monster");
+            System.out.println("\t2. Use an item");
+            System.out.println("\t3. Run [This will put you back to the previous room]");
 
             String input = scan.nextLine();
             if(input.equals("1")) {
                 //check whether they have a sword
-                if()
+                if(player.searchSack("Sword")) {
+                    System.out.println("\tYou strike the " + monster.getName() + " for "
+                                        + sword.getDamageValue() + " damage!");
+                    System.out.println("\tYou take " + monster.getDamage() + " from the monster!");
+
+
+                    if(player.getHealth() < 1) {
+                        System.out.println("\t>You've taken way too much damage, you die from you incompetence.");
+                        //set the win condition to true and give them a game over
+                        break;
+                    }
+                }
             }
             else if(input.equals("2")) {
                 //check how many potions the player has
-                if()
+                if(player.searchSack("Potion")) {
+
+                }
             }
             else if(input.equals("3")) {
                 System.out.println("You ran away from the " + monster.getName() + "!");
