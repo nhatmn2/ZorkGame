@@ -1,6 +1,7 @@
 package src.com.company;
 //package com.company;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 final class Direction {
@@ -22,7 +23,7 @@ final class Direction {
 //==================================================================
 // Mapsite
 //==================================================================
-abstract class MapSite{
+abstract class MapSite {
     private String name;
     private String description;
 
@@ -42,17 +43,17 @@ abstract class MapSite{
 //========================================================================
 // Abstract item
 //========================================================================
-abstract class Item {
+abstract class Item extends ItemList{
     protected int damageValue;
-    abstract int getDamageValue();
-}
+    protected int returnHealthValue;
+    protected String name;
 
-abstract interface Battle {
-
+    abstract public int getDamageValue();
+    abstract public int getReturnHealthValue();
 }
 
 //========================================================================
-// Abstract Monster
+// Monster
 //========================================================================
 class Monster {
     protected  static int health;
@@ -96,9 +97,22 @@ class Slime extends Monster {
 class Sword extends Item {
     public Sword() {
         this.damageValue = 25;
+        this.name = "Sword";
     }
 
-    public int getDamageValue() { return damageValue; }
+    public int getDamageValue() { return this.damageValue; }
+    public int getReturnHealthValue() { return 0; }
+
+    public String toString() { return "Sword"; }
+}
+
+class HealthPotion extends Item {
+    public HealthPotion() { returnHealthValue = 25; this.name = "Health Potion"; }
+
+    public int getDamageValue() { return 0; }
+    public int getReturnHealthValue() { return this.returnHealthValue; }
+
+    public String toString()
 }
 
 
@@ -107,19 +121,20 @@ class Sword extends Item {
 //==================================================================
 class Player extends MapSite {
     private int health;
-    private String[] sack;
+    private ArrayList<Item> sack;
     private Room roomPosition;  //the room at which the player present
+    ItemList itemList;
 
     private Stack<Room> roomLog = new Stack<>(); //this is to keep track of the room player has visited
 
-    //private String name; //I leave it hear if you want to have the player's name
 
+    //private String name; //I leave it hear if you want to have the player's name
 
     //constructor for creating the player
     public Player(Room startRoom){
         super("player 1 ", "this is player 1");
         this.health = 100;
-        this.sack = new String[10];
+        this.sack = new ArrayList<Item>(10);
         this.roomPosition = startRoom;
 
         this.roomLog.add(startRoom);
@@ -136,6 +151,15 @@ class Player extends MapSite {
         return health;
     }
 
+    public Item getItemFromSack(String item) {
+        for(int i = 0; i < sack.size(); ++i){
+            if(sack.get(i).toString().equals(item)) {
+                return sack.get(i);
+            }
+        }
+        return null;
+    }
+
     //set players health
     public void setHealth(int health) {
         this.health = health;
@@ -143,12 +167,16 @@ class Player extends MapSite {
 
     //search through players inventory
     public boolean searchSack(String item) {
-        for(int i = 0; i < sack.length; ++i) {
-            if(Arrays.asList(sack).contains(item)) {
+        for(int i = 0; i < sack.size(); ++i) {
+            if(sack.get(i).toString().equals(item)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public void pickUpItems(Item newItem) {
+        sack.add(newItem);
     }
 
     //this function is used to set the player position
@@ -194,7 +222,6 @@ class Room extends MapSite {
 
     }
 
-
     //method setSide() inside Room
     public void setSide(Direction d, MapSite site){
         if (d == Direction.North){
@@ -238,8 +265,6 @@ class Room extends MapSite {
         System.out.println("enter to Room " + roomNumber);
     }
 
-
-
 }
 //=======================================================================================================
 //create class Wall
@@ -253,7 +278,7 @@ class Wall extends MapSite{
     public Wall(){
         super("","");
         wallNumber = wallCount++;
-        System.out.println("creating Wall number" +  Integer.toString(wallNumber));
+//        System.out.println("creating Wall number" +  Integer.toString(wallNumber));
     }
     //method toString() inside Wall
     public String toString(){
@@ -309,7 +334,7 @@ class Door extends MapSite{
 
 class Maze {
     //this class has and Arraylist to keep track of the number of maze
-    private List<Room> roomList = new ArrayList<Room>();
+    private ArrayList<Room> roomList = new ArrayList<Room>();
 
     public Maze(){
         //System.out.println("creating a Maze ");
@@ -336,7 +361,7 @@ class Maze {
 
     public void showRoomList() {
         for(Room roomInMaze : roomList){
-            System.out.println(roomInMaze);
+            System.out.println(roomInMaze.toString());
         }
     }
 
@@ -348,21 +373,26 @@ class Maze {
 //========================================================================================================
 
 class ItemList {
-    private List<String> itemList = new ArrayList<String>();
+//    private List<String> itemList = new ArrayList<String>();
+    public List<Item> item = new ArrayList<Item>();
 
     //this method is to add the tool into toolList
-    void addItems(String item) {
-        if(!itemList.contains(item)){
-            itemList.add(item);
+    void addItems(Item itemName) {
+        if(!item.contains(item)){
+            item.add(itemName);
         }
     }
 
     //this method is to print the toolList to the user
     void showItemList(){
-        for(String tool : itemList){
+        for(Item tool : item){
             System.out.println(tool);
         }
     }
+
+//    public Item getFromItemList(Item newItem) {
+//        return newItem.name
+//    }
 }
 
 //======================================================================================================
@@ -382,11 +412,11 @@ class LivingRoom extends Room {
         //this is for creating item list inside living room!
         //getDescription();
         ItemList livingRoomItemList = new ItemList();
-        livingRoomItemList.addItems("Trophy case");
-        livingRoomItemList.addItems("Lamp");
-        livingRoomItemList.addItems("Rug");
-        livingRoomItemList.addItems("Old Sword");
-        livingRoomItemList.showItemList();
+//        livingRoomItemList.addItems("Trophy case");
+//        livingRoomItemList.addItems("Lamp");
+//        livingRoomItemList.addItems("Rug");
+//        livingRoomItemList.addItems("Old Sword");
+//        livingRoomItemList.showItemList();
     }
 //    public String getDescription(){
 //        return description;
@@ -422,10 +452,10 @@ class Kitchen extends Room {
         //System.out.println(description);
         //getDescription();
         ItemList kitchenItemList = new ItemList();
-        kitchenItemList.addItems("Sack");
-        kitchenItemList.addItems("Garlic");
-        kitchenItemList.addItems("Bottle of water");
-        kitchenItemList.showItemList();
+//        kitchenItemList.addItems("Sack");
+//        kitchenItemList.addItems("Garlic");
+//        kitchenItemList.addItems("Bottle of water");
+//        kitchenItemList.showItemList();
     }
 
 //    public String getDescription() {
@@ -444,21 +474,27 @@ class Kitchen extends Room {
 
 class Attic extends Room {
     //don't forget to create items for the attic
+    private ItemList atticItemList = new ItemList();
 
     //private final String description = "You are entering the attic.";
     Attic() {
         super("attic", "You are entering the attic");
         //System.out.println(description);
-        //getDescription();
-        ItemList atticItemList = new ItemList();
-        atticItemList.addItems("Rope");
-        atticItemList.addItems("Brick");
-        atticItemList.addItems("Axe");
-        atticItemList.showItemList(); //just to test whether the items are showing up
+        Sword sword = new Sword();
+        HealthPotion healthPotion = new HealthPotion();
+//        //getDescription();
+//        atticItemList.addItems("Rope");
+        atticItemList.addItems(healthPotion);
+        atticItemList.addItems(sword);
+//        atticItemList.showItemList(); //just to test whether the items are showing up
     }
 //    public String getDescription() {
 //        return description;
 //    }
+
+    public ItemList getAtticItemList() {
+        return atticItemList;
+    }
 
     public String toString() { return "attic"; }
 }
@@ -945,8 +981,9 @@ public class Zork {
         //System.out.println("Hello");
         System.out.println();
 
-        Player newPlayer = new Player(maze.getRoom("Grassy Fields"));
-        Sword sword = new Sword();
+        Player newPlayer = new Player(maze.getRoom("Grassyfields"));
+        System.out.println(maze.getRoom("Attic"));
+//        Sword sword = new Sword();
 
 //        System.out.println();
 //        System.out.println(newPlayer.getPosition().getSide(Direction.East).getName());
@@ -969,6 +1006,7 @@ public class Zork {
             else if(checkLegitCommand(list)){ //this function is for checking if the command is correct
                 if(isValidMove(newPlayer, list)) { //this is to check if they input any of the keywords
                     //check whether the player is inside a room with the monster in it
+//                    Battle(newPlayer, sword, mon)
                 }
                 else if(!isValidMove(newPlayer, list)){
                     System.out.println("Please input a valid command.");
@@ -1098,7 +1136,7 @@ public class Zork {
     }
 
     //work on the return value, whether it be a boolean or not
-    public static void Battle(Player player, Sword sword, Monster monster) {
+    public static void Battle(Player player, Monster monster, Room room) {
         Scanner scan = new Scanner(System.in);
         System.out.println("=================================================");
         System.out.println("A " + monster.getName() + " appeared!");
@@ -1109,7 +1147,7 @@ public class Zork {
             System.out.println("\tThe enemies health: " + monster.getHealth());
             System.out.println("\tWhat would you like to do? ");
             System.out.println("\t1. Attack the " + monster.getName());
-            System.out.println("\t2. Use an item");
+            System.out.println("\t2. Use a health potion");
             System.out.println("\t3. Run! [This will put you back to the previous room]");
 
             String input = scan.nextLine();
@@ -1117,8 +1155,9 @@ public class Zork {
                 //check whether they have a sword
                 if(player.searchSack("Sword")) {
                     System.out.println("\tYou strike the " + monster.getName() + " for "
-                                        + sword.getDamageValue() + " damage!");
-                    monster.setHealth(monster.getHealth() - sword.getDamageValue());
+                                        + player + " damage!");
+                    //hitting the monster and lowering its health
+                    monster.setHealth(monster.getHealth() - player.getItemFromSack("Sword").getDamageValue());
                     System.out.println("\tYou take " + monster.getDamage() + " from the monster!");
                     player.setHealth(player.getHealth() - monster.getDamage());
 
@@ -1130,7 +1169,7 @@ public class Zork {
                 }
             }
             else if(input.equals("2")) {
-                if(player.searchSack("Potion")) {
+                if(player.searchSack("Health Potion")) {
                     //check how many potions the player has
 
                 }
@@ -1139,6 +1178,7 @@ public class Zork {
                 System.out.println("You ran away from the " + monster.getName() + "!");
                 //monster will still be in that room
                 //set player position back to the previous room they were in
+                maze.getRoom("living room");
                 break;
             }
             else {
