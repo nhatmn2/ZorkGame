@@ -44,25 +44,37 @@ abstract class MapSite{
 //========================================================================
 abstract class Item {
     protected int damageValue;
-
-
     abstract int getDamageValue();
+}
+
+abstract interface Battle {
+
 }
 
 //========================================================================
 // Abstract Monster
 //========================================================================
-abstract class Monster {
-    protected int health;
+class Monster {
+    protected  static int health;
     protected int damage;
     protected String monsterDescription;
     protected String monsterName;
 
+    public Monster() { this(0, 0, "nothing", "nothing"); }
+    public Monster(int health, int damage, String monsterDescription, String monsterName) {
+        this.health = health;
+        this.damage = damage;
+        this.monsterDescription = monsterDescription;
+        this.monsterName = monsterName;
+    }
+
+    //getters
     public int getDamage() { return damage; }
     public int getHealth() { return health; }
     public String getName() { return monsterName; }
     public String getMonsterDescription() { return monsterDescription; }
 
+    //setters
     public void setHealth(int health) { this.health = health; }
 }
 
@@ -97,6 +109,7 @@ class Player extends MapSite {
     private int health;
     private String[] sack;
     private Room roomPosition;  //the room at which the player present
+
     private Stack<Room> roomLog = new Stack<>(); //this is to keep track of the room player has visited
 
     //private String name; //I leave it hear if you want to have the player's name
@@ -104,32 +117,37 @@ class Player extends MapSite {
 
     //constructor for creating the player
     public Player(Room startRoom){
-        super("player 1", "this is player 1");
+        super("player 1 ", "this is player 1");
         this.health = 100;
         this.sack = new String[10];
         this.roomPosition = startRoom;
+
         this.roomLog.add(startRoom);
         //System.out.println(roomPosition);
     }
-
-    //get health
-    public int getHealth() { return health; }
-
-    public void setHealth(int health) { this.health = health; }
 
     //this function is used to get the player position (i.e in what room)
     public Room getPosition() {
         return roomPosition;
     }
 
-    //searches the sack if that item exists
-    public boolean searchSack(String name) {
+    //get players health
+    public int getHealth() {
+        return health;
+    }
+
+    //set players health
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    //search through players inventory
+    public boolean searchSack(String item) {
         for(int i = 0; i < sack.length; ++i) {
-            if(sack.equals(name)) {
-                return true; //returns true if the item does exist
+            if(Arrays.asList(sack).contains(item)) {
+                return true;
             }
         }
-        //returns false if the item inside the sack does not exist
         return false;
     }
 
@@ -138,19 +156,19 @@ class Player extends MapSite {
         this.roomPosition = destinationRoom;
     }
 
-    //check for this function
-    public void makePlayerMove(Door doorBetweenRooms){
-        this.roomPosition = doorBetweenRooms.getDestinationRoom() ;
-        if(!roomLog.contains(doorBetweenRooms.getDestinationRoom()))
-            roomLog.pop();
+    //this function is used to update player position
+    public void updatePlayer(Room destinationRoom){
+        this.roomPosition = destinationRoom;
+        if(!roomLog.contains(destinationRoom)){
+            roomLog.push(destinationRoom);
+        }
         else
-            roomLog.push(doorBetweenRooms.getDestinationRoom());
-
+            roomLog.pop();
     }
 
     public void enter() {}
 
-    //this function to check for the valid more
+    //this function to check for the valid move
 
 }
 
@@ -950,7 +968,7 @@ public class Zork {
             }
             else if(checkLegitCommand(list)){ //this function is for checking if the command is correct
                 if(isValidMove(newPlayer, list)) { //this is to check if they input any of the keywords
-
+                    //check whether the player is inside a room with the monster in it
                 }
                 else if(!isValidMove(newPlayer, list)){
                     System.out.println("Please input a valid command.");
@@ -1079,18 +1097,20 @@ public class Zork {
         return x;
     }
 
-    public static boolean Battle(Player player, Sword sword, Monster monster) {
+    //work on the return value, whether it be a boolean or not
+    public static void Battle(Player player, Sword sword, Monster monster) {
         Scanner scan = new Scanner(System.in);
         System.out.println("=================================================");
         System.out.println("A " + monster.getName() + " appeared!");
+        System.out.println(monster.getMonsterDescription());
 
         while(monster.getHealth() > 0) {
             System.out.println("\tYour health: " + player.getHealth());
             System.out.println("\tThe enemies health: " + monster.getHealth());
             System.out.println("\tWhat would you like to do? ");
-            System.out.println("\t1. Attack the monster");
+            System.out.println("\t1. Attack the " + monster.getName());
             System.out.println("\t2. Use an item");
-            System.out.println("\t3. Run [This will put you back to the previous room]");
+            System.out.println("\t3. Run! [This will put you back to the previous room]");
 
             String input = scan.nextLine();
             if(input.equals("1")) {
@@ -1098,29 +1118,31 @@ public class Zork {
                 if(player.searchSack("Sword")) {
                     System.out.println("\tYou strike the " + monster.getName() + " for "
                                         + sword.getDamageValue() + " damage!");
+                    monster.setHealth(monster.getHealth() - sword.getDamageValue());
                     System.out.println("\tYou take " + monster.getDamage() + " from the monster!");
                     player.setHealth(player.getHealth() - monster.getDamage());
 
                     if(player.getHealth() < 1) {
-                        System.out.println("\t>You've taken way too much damage, you die from you incompetence.");
+                        System.out.println("\t>You've taken way too much damage, you die from your incompetence.");
                         //set the win condition to true and give them a game over
                         break;
                     }
                 }
             }
             else if(input.equals("2")) {
-                //check how many potions the player has
                 if(player.searchSack("Potion")) {
+                    //check how many potions the player has
 
                 }
             }
             else if(input.equals("3")) {
                 System.out.println("You ran away from the " + monster.getName() + "!");
                 //monster will still be in that room
+                //set player position back to the previous room they were in
                 break;
             }
             else {
-                System.out.println("Please input a the given commands.");
+                System.out.println("Please input any of the given commands.");
                 continue;
             }
 
